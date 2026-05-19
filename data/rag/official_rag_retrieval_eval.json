@@ -1,0 +1,426 @@
+{
+  "task": "official_document_rag_retrieval",
+  "method": "metadata + curated official-document chunks; lexical TF-IDF style ranking",
+  "query_count": 7,
+  "hit_at_1": 0.8571,
+  "hit_at_3": 1.0,
+  "hit_at_5": 1.0,
+  "important_note": "This evaluates whether the MVP retrieves the intended official guidance category, not factual legal correctness.",
+  "queries": [
+    {
+      "query": "근저당권 채권최고액 보증금 말소 조건 등기부 확인",
+      "expected_risk_key": "mortgage",
+      "top_results": [
+        {
+          "score": 12.9103,
+          "chunk_id": "registration_01",
+          "document_id": "real_estate_registration_act",
+          "title": "부동산등기법 관련 안내 자료",
+          "risk_keys": [
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        },
+        {
+          "score": 6.8788,
+          "chunk_id": "standard_contract_01",
+          "document_id": "standard_housing_lease_contract",
+          "title": "주택임대차 표준계약서",
+          "risk_keys": [
+            "mortgage",
+            "trust",
+            "unchecked"
+          ]
+        },
+        {
+          "score": 5.2491,
+          "chunk_id": "lease_decree_01",
+          "document_id": "housing_lease_protection_enforcement_decree",
+          "title": "주택임대차보호법 시행령",
+          "risk_keys": [
+            "multifamily",
+            "rent_gap"
+          ]
+        },
+        {
+          "score": 3.4636,
+          "chunk_id": "lease_act_01",
+          "document_id": "housing_lease_protection_act",
+          "title": "주택임대차보호법",
+          "risk_keys": [
+            "unchecked",
+            "multifamily",
+            "jeonse_ratio"
+          ]
+        },
+        {
+          "score": 3.0472,
+          "chunk_id": "building_01",
+          "document_id": "building_registry_guide",
+          "title": "건축물대장 확인 안내 자료",
+          "risk_keys": [
+            "violation",
+            "unchecked"
+          ]
+        }
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "query": "신탁등기 신탁원부 임대 권한 동의서 확인",
+      "expected_risk_key": "trust",
+      "top_results": [
+        {
+          "score": 8.7363,
+          "chunk_id": "registration_01",
+          "document_id": "real_estate_registration_act",
+          "title": "부동산등기법 관련 안내 자료",
+          "risk_keys": [
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        },
+        {
+          "score": 3.0472,
+          "chunk_id": "building_01",
+          "document_id": "building_registry_guide",
+          "title": "건축물대장 확인 안내 자료",
+          "risk_keys": [
+            "violation",
+            "unchecked"
+          ]
+        },
+        {
+          "score": 2.4584,
+          "chunk_id": "molit_checklist_01",
+          "document_id": "molit_jeonse_fraud_checklist",
+          "title": "국토교통부 전세사기 예방 체크리스트",
+          "risk_keys": [
+            "unchecked",
+            "jeonse_ratio",
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        },
+        {
+          "score": 1.452,
+          "chunk_id": "lease_act_01",
+          "document_id": "housing_lease_protection_act",
+          "title": "주택임대차보호법",
+          "risk_keys": [
+            "unchecked",
+            "multifamily",
+            "jeonse_ratio"
+          ]
+        },
+        {
+          "score": 1.452,
+          "chunk_id": "realtor_act_01",
+          "document_id": "licensed_realtor_act",
+          "title": "공인중개사법",
+          "risk_keys": [
+            "unchecked",
+            "violation"
+          ]
+        }
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "query": "압류 가압류 계약 보류 등기부 위험",
+      "expected_risk_key": "seizure",
+      "top_results": [
+        {
+          "score": 21.6278,
+          "chunk_id": "registration_01",
+          "document_id": "real_estate_registration_act",
+          "title": "부동산등기법 관련 안내 자료",
+          "risk_keys": [
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        },
+        {
+          "score": 3.7533,
+          "chunk_id": "molit_checklist_01",
+          "document_id": "molit_jeonse_fraud_checklist",
+          "title": "국토교통부 전세사기 예방 체크리스트",
+          "risk_keys": [
+            "unchecked",
+            "jeonse_ratio",
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        },
+        {
+          "score": 3.0281,
+          "chunk_id": "lease_act_01",
+          "document_id": "housing_lease_protection_act",
+          "title": "주택임대차보호법",
+          "risk_keys": [
+            "unchecked",
+            "multifamily",
+            "jeonse_ratio"
+          ]
+        },
+        {
+          "score": 2.2993,
+          "chunk_id": "standard_contract_01",
+          "document_id": "standard_housing_lease_contract",
+          "title": "주택임대차 표준계약서",
+          "risk_keys": [
+            "mortgage",
+            "trust",
+            "unchecked"
+          ]
+        },
+        {
+          "score": 1.7885,
+          "chunk_id": "confirmation_form_01",
+          "document_id": "property_confirmation_form",
+          "title": "중개대상물 확인설명서 양식",
+          "risk_keys": [
+            "unchecked",
+            "violation",
+            "mortgage"
+          ]
+        }
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "query": "전세가율 보증보험 HUG 반환보증 가입 조건",
+      "expected_risk_key": "jeonse_ratio",
+      "top_results": [
+        {
+          "score": 8.4726,
+          "chunk_id": "standard_contract_01",
+          "document_id": "standard_housing_lease_contract",
+          "title": "주택임대차 표준계약서",
+          "risk_keys": [
+            "mortgage",
+            "trust",
+            "unchecked"
+          ]
+        },
+        {
+          "score": 7.2843,
+          "chunk_id": "hug_01",
+          "document_id": "hug_deposit_return_guarantee",
+          "title": "HUG 전세보증금반환보증 안내문",
+          "risk_keys": [
+            "jeonse_ratio",
+            "mortgage",
+            "violation"
+          ]
+        },
+        {
+          "score": 2.2993,
+          "chunk_id": "molit_checklist_01",
+          "document_id": "molit_jeonse_fraud_checklist",
+          "title": "국토교통부 전세사기 예방 체크리스트",
+          "risk_keys": [
+            "unchecked",
+            "jeonse_ratio",
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        }
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "query": "건축물대장 위반건축물 주용도 전유면적 확인",
+      "expected_risk_key": "violation",
+      "top_results": [
+        {
+          "score": 19.8091,
+          "chunk_id": "building_01",
+          "document_id": "building_registry_guide",
+          "title": "건축물대장 확인 안내 자료",
+          "risk_keys": [
+            "violation",
+            "unchecked"
+          ]
+        },
+        {
+          "score": 2.4584,
+          "chunk_id": "molit_checklist_01",
+          "document_id": "molit_jeonse_fraud_checklist",
+          "title": "국토교통부 전세사기 예방 체크리스트",
+          "risk_keys": [
+            "unchecked",
+            "jeonse_ratio",
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        },
+        {
+          "score": 1.452,
+          "chunk_id": "lease_act_01",
+          "document_id": "housing_lease_protection_act",
+          "title": "주택임대차보호법",
+          "risk_keys": [
+            "unchecked",
+            "multifamily",
+            "jeonse_ratio"
+          ]
+        },
+        {
+          "score": 1.452,
+          "chunk_id": "realtor_act_01",
+          "document_id": "licensed_realtor_act",
+          "title": "공인중개사법",
+          "risk_keys": [
+            "unchecked",
+            "violation"
+          ]
+        },
+        {
+          "score": 1.452,
+          "chunk_id": "registration_01",
+          "document_id": "real_estate_registration_act",
+          "title": "부동산등기법 관련 안내 자료",
+          "risk_keys": [
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        }
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "query": "다가구 선순위 보증금 소액임차인 확인",
+      "expected_risk_key": "multifamily",
+      "top_results": [
+        {
+          "score": 10.2532,
+          "chunk_id": "lease_decree_01",
+          "document_id": "housing_lease_protection_enforcement_decree",
+          "title": "주택임대차보호법 시행령",
+          "risk_keys": [
+            "multifamily",
+            "rent_gap"
+          ]
+        },
+        {
+          "score": 4.3109,
+          "chunk_id": "hug_01",
+          "document_id": "hug_deposit_return_guarantee",
+          "title": "HUG 전세보증금반환보증 안내문",
+          "risk_keys": [
+            "jeonse_ratio",
+            "mortgage",
+            "violation"
+          ]
+        },
+        {
+          "score": 3.4636,
+          "chunk_id": "lease_act_01",
+          "document_id": "housing_lease_protection_act",
+          "title": "주택임대차보호법",
+          "risk_keys": [
+            "unchecked",
+            "multifamily",
+            "jeonse_ratio"
+          ]
+        },
+        {
+          "score": 3.0472,
+          "chunk_id": "building_01",
+          "document_id": "building_registry_guide",
+          "title": "건축물대장 확인 안내 자료",
+          "risk_keys": [
+            "violation",
+            "unchecked"
+          ]
+        },
+        {
+          "score": 2.4584,
+          "chunk_id": "molit_checklist_01",
+          "document_id": "molit_jeonse_fraud_checklist",
+          "title": "국토교통부 전세사기 예방 체크리스트",
+          "risk_keys": [
+            "unchecked",
+            "jeonse_ratio",
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        }
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "query": "계약 전 표준계약서 중개대상물 확인설명서 특약",
+      "expected_risk_key": "unchecked",
+      "top_results": [
+        {
+          "score": 8.913,
+          "chunk_id": "confirmation_form_01",
+          "document_id": "property_confirmation_form",
+          "title": "중개대상물 확인설명서 양식",
+          "risk_keys": [
+            "unchecked",
+            "violation",
+            "mortgage"
+          ]
+        },
+        {
+          "score": 8.7183,
+          "chunk_id": "realtor_act_01",
+          "document_id": "licensed_realtor_act",
+          "title": "공인중개사법",
+          "risk_keys": [
+            "unchecked",
+            "violation"
+          ]
+        },
+        {
+          "score": 8.381,
+          "chunk_id": "standard_contract_01",
+          "document_id": "standard_housing_lease_contract",
+          "title": "주택임대차 표준계약서",
+          "risk_keys": [
+            "mortgage",
+            "trust",
+            "unchecked"
+          ]
+        },
+        {
+          "score": 3.7533,
+          "chunk_id": "molit_checklist_01",
+          "document_id": "molit_jeonse_fraud_checklist",
+          "title": "국토교통부 전세사기 예방 체크리스트",
+          "risk_keys": [
+            "unchecked",
+            "jeonse_ratio",
+            "mortgage",
+            "seizure",
+            "trust"
+          ]
+        },
+        {
+          "score": 3.0281,
+          "chunk_id": "lease_act_01",
+          "document_id": "housing_lease_protection_act",
+          "title": "주택임대차보호법",
+          "risk_keys": [
+            "unchecked",
+            "multifamily",
+            "jeonse_ratio"
+          ]
+        }
+      ],
+      "first_hit_rank": 1
+    }
+  ]
+}

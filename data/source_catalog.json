@@ -1,0 +1,150 @@
+[
+  {
+    "id": "rtms_apt_rent",
+    "name": "국토교통부_아파트 전월세 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/data/15126474/openapi.do",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["지역코드", "법정동", "아파트", "보증금액", "월세금액", "전용면적", "층", "건축년도", "년", "월", "일"],
+    "mvp_role": "아파트 적정 전세가 예측과 유사 거래 비교"
+  },
+  {
+    "id": "rtms_apt_trade",
+    "name": "국토교통부_아파트 매매 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/data/15126469/openapi.do",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["지역코드", "법정동", "아파트", "거래금액", "전용면적", "층", "건축년도", "년", "월", "일"],
+    "mvp_role": "아파트 추정 매매가와 전세가율 계산"
+  },
+  {
+    "id": "rtms_rh_rent",
+    "name": "국토교통부_연립다세대 전월세 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=TOTAL&keyword=%EA%B5%AD%ED%86%A0%EA%B5%90%ED%86%B5%EB%B6%80_%EC%97%B0%EB%A6%BD%EB%8B%A4%EC%84%B8%EB%8C%80%20%EC%A0%84%EC%9B%94%EC%84%B8%20%EC%8B%A4%EA%B1%B0%EB%9E%98%EA%B0%80%20%EC%9E%90%EB%A3%8C",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcRHRent/getRTMSDataSvcRHRent",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["법정동", "연립다세대", "보증금액", "월세금액", "전용면적", "층", "건축년도"],
+    "mvp_role": "빌라·다세대 전세 시세 비교"
+  },
+  {
+    "id": "rtms_rh_trade",
+    "name": "국토교통부_연립다세대 매매 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=TOTAL&keyword=%EA%B5%AD%ED%86%A0%EA%B5%90%ED%86%B5%EB%B6%80_%EC%97%B0%EB%A6%BD%EB%8B%A4%EC%84%B8%EB%8C%80%20%EB%A7%A4%EB%A7%A4%20%EC%8B%A4%EA%B1%B0%EB%9E%98%EA%B0%80%20%EC%9E%90%EB%A3%8C",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcRHTrade/getRTMSDataSvcRHTrade",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["법정동", "연립다세대", "거래금액", "전용면적", "층", "건축년도"],
+    "mvp_role": "빌라·다세대 추정 매매가와 전세가율 계산"
+  },
+  {
+    "id": "rtms_offi_rent",
+    "name": "국토교통부_오피스텔 전월세 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/data/15126475/openapi.do",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcOffiRent/getRTMSDataSvcOffiRent",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["법정동", "단지", "보증금", "월세", "전용면적", "층", "건축년도"],
+    "mvp_role": "오피스텔 전세 시세 비교"
+  },
+  {
+    "id": "rtms_offi_trade",
+    "name": "국토교통부_오피스텔 매매 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/data/15126464/openapi.do",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["법정동", "단지", "거래금액", "전용면적", "층", "건축년도"],
+    "mvp_role": "오피스텔 추정 매매가와 전세가율 계산"
+  },
+  {
+    "id": "rtms_sh_rent",
+    "name": "국토교통부_단독/다가구 전월세 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=TOTAL&keyword=%EA%B5%AD%ED%86%A0%EA%B5%90%ED%86%B5%EB%B6%80_%EB%8B%A8%EB%8F%85%EB%8B%A4%EA%B0%80%EA%B5%AC%20%EC%A0%84%EC%9B%94%EC%84%B8%20%EC%8B%A4%EA%B1%B0%EB%9E%98%EA%B0%80%20%EC%9E%90%EB%A3%8C",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcSHRent/getRTMSDataSvcSHRent",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["법정동", "보증금액", "월세금액", "계약면적", "건축년도"],
+    "mvp_role": "단독·다가구 전세 시세와 선순위 보증금 확인 안내"
+  },
+  {
+    "id": "rtms_sh_trade",
+    "name": "국토교통부_단독/다가구 매매 실거래가 자료",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=TOTAL&keyword=%EA%B5%AD%ED%86%A0%EA%B5%90%ED%86%B5%EB%B6%80_%EB%8B%A8%EB%8F%85%EB%8B%A4%EA%B0%80%EA%B5%AC%20%EB%A7%A4%EB%A7%A4%20%EC%8B%A4%EA%B1%B0%EB%9E%98%EA%B0%80%20%EC%9E%90%EB%A3%8C",
+    "api_endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcSHTrade/getRTMSDataSvcSHTrade",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["LAWD_CD", "DEAL_YMD", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["법정동", "거래금액", "연면적", "대지면적", "건축년도"],
+    "mvp_role": "단독·다가구 추정 매매가와 전세가율 계산"
+  },
+  {
+    "id": "building_title",
+    "name": "국토교통부_건축물대장 표제부",
+    "provider": "국토교통부",
+    "official_url": "https://www.data.go.kr/dataset/15004825/openapi.do",
+    "api_endpoint": "https://apis.data.go.kr/1613000/BldRgstService_v2/getBrTitleInfo",
+    "auth": "data.go.kr service key",
+    "format": "XML",
+    "params": ["sigunguCd", "bjdongCd", "platGbCd", "bun", "ji", "serviceKey", "pageNo", "numOfRows"],
+    "fields_used": ["대지위치", "도로명대지위치", "건물명", "동명칭", "주용도코드명", "세대수", "가구수", "사용승인일", "위반건축물여부"],
+    "mvp_role": "주택 용도, 사용승인연도, 위반건축물 여부 확인"
+  },
+  {
+    "id": "law_lease",
+    "name": "주택임대차보호법 및 시행령",
+    "provider": "법제처 국가법령정보센터",
+    "official_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=001248",
+    "auth": "none for browsing / API optional",
+    "format": "HTML/XML",
+    "fields_used": ["대항력", "확정일자", "우선변제권", "임차인 보호 규정"],
+    "mvp_role": "RAG 근거 문서"
+  },
+  {
+    "id": "hug_return_guarantee",
+    "name": "HUG 전세보증금반환보증 상품 안내",
+    "provider": "주택도시보증공사",
+    "official_url": "https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp",
+    "auth": "none for browsing",
+    "format": "HTML",
+    "fields_used": ["보증대상주택", "보증한도", "보증조건", "신청기한"],
+    "mvp_role": "전세가율·선순위채권 관련 RAG 근거"
+  },
+  {
+    "id": "rag_official_sources",
+    "name": "전세계약 위험 진단 RAG 공식 출처 목록",
+    "provider": "법제처·국토교통부·정부24·HUG·법무부·서울특별시",
+    "official_url": "data/rag_official_sources.json",
+    "auth": "none for browsing",
+    "format": "JSON",
+    "fields_used": ["required_item", "provider", "official_url", "source_type", "source_verified_at", "mvp_usage"],
+    "mvp_role": "4-4 RAG 문서 데이터의 공식 링크와 MVP 활용 근거 증빙"
+  },
+  {
+    "id": "address_code",
+    "name": "법정동코드",
+    "provider": "행정표준코드관리시스템",
+    "official_url": "https://www.code.go.kr",
+    "auth": "none for browsing",
+    "format": "CSV/XLS download",
+    "fields_used": ["시도", "시군구", "법정동", "법정동코드"],
+    "mvp_role": "주소 정규화와 API LAWD_CD 생성"
+  }
+]

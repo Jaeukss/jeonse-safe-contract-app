@@ -1,0 +1,120 @@
+{
+  "created_for": "Transportation-and-Logistics-Contest MVP",
+  "source_note": "Raw ZIP files stay outside Git/Hugging Face because the uncompressed building-registry files are multi-GB public datasets.",
+  "input_dir": "C:\\Users\\User\\Downloads",
+  "output_dir": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\data\\registry",
+  "max_rows_per_zip": 800,
+  "max_rows_per_file": 80,
+  "zip_count": 10,
+  "records_sampled": 8000,
+  "feature_rows": 5018,
+  "rag_chunks": 5018,
+  "official_source_url": "https://www.data.go.kr/dataset/15004825/openapi.do",
+  "important_limitations": [
+    "The provided registry CSV samples do not expose a direct violation-building flag; violation_status is kept as unknown instead of inferred.",
+    "The classifier is weakly supervised from registry-quality/risk-review rules, not trained on confirmed fraud outcomes.",
+    "For production, run this pipeline without row limits and join confirmed labels from adjudicated cases or public safety outcomes."
+  ],
+  "sources": [
+    {
+      "source_zip": "(경기)국토교통부_건축물대장_전유부.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(경기)국토교통부_건축물대장_전유부.zip",
+      "source_region": "경기",
+      "registry_table": "unit",
+      "zip_size_bytes": 51014916,
+      "csv_files_seen": 47,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(경기)국토교통부_건축물대장_층별개요.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(경기)국토교통부_건축물대장_층별개요.zip",
+      "source_region": "경기",
+      "registry_table": "floor",
+      "zip_size_bytes": 69129621,
+      "csv_files_seen": 47,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(경기)국토교통부_건축물대장_표제부.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(경기)국토교통부_건축물대장_표제부.zip",
+      "source_region": "경기",
+      "registry_table": "title",
+      "zip_size_bytes": 58838907,
+      "csv_files_seen": 47,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(서울)국토교통부_건축물대장_전유공용면적.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(서울)국토교통부_건축물대장_전유공용면적.zip",
+      "source_region": "서울",
+      "registry_table": "area",
+      "zip_size_bytes": 162829952,
+      "csv_files_seen": 34,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(서울)국토교통부_건축물대장_전유부.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(서울)국토교통부_건축물대장_전유부.zip",
+      "source_region": "서울",
+      "registry_table": "unit",
+      "zip_size_bytes": 41475272,
+      "csv_files_seen": 25,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(서울)국토교통부_건축물대장_층별개요.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(서울)국토교통부_건축물대장_층별개요.zip",
+      "source_region": "서울",
+      "registry_table": "floor",
+      "zip_size_bytes": 45405497,
+      "csv_files_seen": 25,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(서울)국토교통부_건축물대장_표제부.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(서울)국토교통부_건축물대장_표제부.zip",
+      "source_region": "서울",
+      "registry_table": "title",
+      "zip_size_bytes": 27767453,
+      "csv_files_seen": 25,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(인천)국토교통부_건축물대장_전유부.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(인천)국토교통부_건축물대장_전유부.zip",
+      "source_region": "인천",
+      "registry_table": "unit",
+      "zip_size_bytes": 13362905,
+      "csv_files_seen": 10,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(인천)국토교통부_건축물대장_층별개요.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(인천)국토교통부_건축물대장_층별개요.zip",
+      "source_region": "인천",
+      "registry_table": "floor",
+      "zip_size_bytes": 13152450,
+      "csv_files_seen": 10,
+      "rows_sampled": 800,
+      "status": "ok"
+    },
+    {
+      "source_zip": "(인천)국토교통부_건축물대장_표제부.zip",
+      "source_path": "C:\\Users\\User\\Downloads\\(인천)국토교통부_건축물대장_표제부.zip",
+      "source_region": "인천",
+      "registry_table": "title",
+      "zip_size_bytes": 10231868,
+      "csv_files_seen": 10,
+      "rows_sampled": 800,
+      "status": "ok"
+    }
+  ]
+}

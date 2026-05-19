@@ -1,0 +1,90 @@
+{
+  "source_documents": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\data\\rag_documents_mvp.json",
+  "source_catalog": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\data\\rag_official_sources.json",
+  "chunk_count": 10,
+  "document_count": 10,
+  "source_count": 10,
+  "copyright_policy": "The repository stores MVP summaries, metadata, chunk ids, and official URLs. Full third-party PDFs are not copied into Git.",
+  "core_sources": [
+    {
+      "id": "housing_lease_protection_act",
+      "name": "주택임대차보호법",
+      "official_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=001248",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "law"
+    },
+    {
+      "id": "housing_lease_protection_decree",
+      "name": "주택임대차보호법 시행령",
+      "official_url": "https://www.law.go.kr/법령/주택임대차보호법시행령",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "decree"
+    },
+    {
+      "id": "licensed_realtor_act",
+      "name": "공인중개사법",
+      "official_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=273341",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "law"
+    },
+    {
+      "id": "real_estate_registration_act",
+      "name": "부동산등기법 관련 안내 자료",
+      "official_url": "https://www.law.go.kr/법령/부동산등기법",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "law"
+    },
+    {
+      "id": "building_registry_guide",
+      "name": "건축물대장 확인 안내 자료",
+      "official_url": "https://m.gov.kr/mw/AA020InfoCappView.do?CappBizCD=15000000098&HighCtgCD=A09005&tp_seq=01",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "civil_service_guide_and_public_data"
+    },
+    {
+      "id": "hug_deposit_return_guarantee",
+      "name": "HUG 전세보증금반환보증 안내문",
+      "official_url": "https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp",
+      "leaflet_url": null,
+      "mobile_apply_url": "https://onestop.khug.or.kr/view/biz/apply/goods001",
+      "source_type": "guarantee_guide"
+    },
+    {
+      "id": "molit_jeonse_fraud_checklist",
+      "name": "국토교통부 전세사기 예방 체크리스트",
+      "official_url": "https://www.molit.go.kr/2023safehome/main.jsp",
+      "leaflet_url": "https://www.molit.go.kr/portal/common/download/DownloadMltm2.jsp?FileName=%EC%A0%84%EC%84%B8%EA%B3%84%EC%95%BD+%EC%9C%A0%EC%9D%98%EC%82%AC%ED%95%AD+%EB%A6%AC%ED%94%8C%EB%A0%9B.pdf&FilePath=portal%2FDextUpload%2F202301%2F20230113_090421_309.pdf",
+      "mobile_apply_url": null,
+      "source_type": "checklist_and_leaflet"
+    },
+    {
+      "id": "local_government_jeonse_notice",
+      "name": "지자체 전세사기 예방 안내문",
+      "official_url": "https://housing.seoul.go.kr/site/main/content/sh05_070100",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "local_government_notice"
+    },
+    {
+      "id": "standard_housing_lease_contract",
+      "name": "주택임대차 표준계약서",
+      "official_url": "https://moj.go.kr/moj/314/subview.do",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "standard_contract_form"
+    },
+    {
+      "id": "property_confirmation_form",
+      "name": "중개대상물 확인설명서 양식",
+      "official_url": "https://www.law.go.kr/LSW/lsSideInfoP.do?docCls=jo&joNo=0016&lsiSeq=263573&urlMode=lsScJoRltInfoR",
+      "leaflet_url": null,
+      "mobile_apply_url": null,
+      "source_type": "statutory_form"
+    }
+  ]
+}

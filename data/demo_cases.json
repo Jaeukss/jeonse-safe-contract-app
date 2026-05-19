@@ -1,0 +1,76 @@
+[
+  {
+    "case_id": "CASE-1",
+    "title": "정상 OCR + 안전에 가까움",
+    "input": {
+      "address": "서울시 관악구 신림동",
+      "housing_type": "다가구",
+      "deposit": 90000000,
+      "area_m2": 27.1,
+      "floor": 2
+    },
+    "documents": {
+      "registry_text": "등기사항전부증명서 갑구 을구 권리관계 해당없음",
+      "building_text": "건축물대장 주용도 단독주택 사용승인일 2004 위반건축물 해당없음"
+    },
+    "expected": "현재 확인된 정보 기준 위험 신호가 적음"
+  },
+  {
+    "case_id": "CASE-2",
+    "title": "OCR 실패 + 체크박스 보완",
+    "input": {
+      "address": "서울시 관악구 신림동",
+      "housing_type": "다가구",
+      "deposit": 135000000,
+      "area_m2": 27.1,
+      "floor": 2
+    },
+    "checklist": {
+      "mortgage_flag": false,
+      "seizure_flag": false,
+      "trust_flag": null
+    },
+    "expected": "진단 가능, 신탁 여부 미확인 및 OCR 실패로 문서 신뢰도 낮음"
+  },
+  {
+    "case_id": "CASE-3",
+    "title": "OCR과 체크박스 충돌",
+    "input": {
+      "address": "서울시 관악구 신림동",
+      "housing_type": "다가구",
+      "deposit": 135000000,
+      "area_m2": 27.1,
+      "floor": 2
+    },
+    "ocr": {
+      "mortgage_flag": true
+    },
+    "checklist": {
+      "mortgage_flag": false
+    },
+    "expected": "충돌 감지 후 사용자 확인"
+  },
+  {
+    "case_id": "CASE-4",
+    "title": "고위험",
+    "input": {
+      "address": "서울시 관악구 신림동",
+      "housing_type": "다가구",
+      "deposit": 650000000,
+      "area_m2": 27.1,
+      "floor": 2
+    },
+    "ocr": {
+      "trust_flag": true
+    },
+    "checklist": {
+      "senior_deposit_checked": false
+    },
+    "expected": "고위험, 수탁자 동의 여부와 선순위 임차보증금 확인 안내"
+  },
+  {
+    "case_id": "CASE-5",
+    "title": "재진단",
+    "expected": "SNAP-001 유지, SNAP-002 신규 생성"
+  }
+]

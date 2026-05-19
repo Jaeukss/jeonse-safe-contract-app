@@ -1,6 +1,4 @@
+data/xlsx/~$*.xlsx
+huggingface-space-package.zip
 __pycache__/
 *.pyc
-.streamlit/secrets.toml
-.env
-venv/
-.venv/

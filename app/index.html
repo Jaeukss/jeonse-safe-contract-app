@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>전세계약 안심진단 서비스</title>
+    <link rel="stylesheet" href="styles.css?v=official-sources-1" />
+    <script src="../src/risk-engine.js?v=official-sources-1" defer></script>
+    <script src="app.js?v=official-sources-1" defer></script>
+  </head>
+  <body>
+    <div class="official-strip">
+      <span class="flag-mark">국토교통 데이터 활용 MVP</span>
+      <span>전세계약 위험 신호를 공공데이터와 RAG 근거 문서로 설명하는 제출용 시연 서비스입니다.</span>
+    </div>
+
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="진행 순서">
+        <div class="brand">
+          <span class="brand-symbol">안심</span>
+          <div>
+            <strong>전세계약 안심진단</strong>
+            <small>업로드부터 결과까지 순서대로 진행</small>
+          </div>
+        </div>
+
+        <nav class="side-nav" aria-label="단계 이동">
+          <a class="active" href="#step-upload" data-section-link><span>1</span>문서 업로드</a>
+          <a href="#step-contract" data-section-link><span>2</span>계약 정보</a>
+          <a href="#step-checklist" data-section-link><span>3</span>문서 확인</a>
+          <a href="#step-market" data-section-link><span>4</span>데이터 비교</a>
+          <a href="#step-report" data-section-link><span>5</span>결과 리포트</a>
+        </nav>
+
+        <section class="sidebar-note">
+          <b>사용 순서</b>
+          <p>먼저 PDF를 올린 뒤 아래 버튼만 누르면 다음 단계로 내려갑니다. 필요한 경우 사이드바로 같은 순서의 위치만 바로 이동할 수 있습니다.</p>
+        </section>
+      </aside>
+
+      <main class="main">
+        <header class="service-header">
+          <div>
+            <p class="kicker">문서 업로드 먼저, 이후 순차 진행</p>
+            <h1>전세계약 안심진단</h1>
+            <p class="header-copy">등기부등본, 건축물대장, 확인설명서를 먼저 올리고 계약 정보를 입력하면 실거래가, 건축물대장, RAG 문서 근거를 묶어 위험 신호를 설명합니다.</p>
+          </div>
+          <div class="header-actions">
+            <button id="copyReport" type="button">결과 복사</button>
+            <button id="downloadJson" class="primary" type="button">진단 결과 저장</button>
+          </div>
+        </header>
+
+        <section class="diagnosis-board" aria-label="현재 진단 요약">
+          <article class="status-card status-grade">
+            <span>현재 판정</span>
+            <strong id="grade">-</strong>
+            <p id="summary">문서를 업로드하고 정보를 입력하면 결과가 표시됩니다.</p>
+          </article>
+          <article class="status-card">
+            <span>위험 점수</span>
+            <strong id="score">0점</strong>
+            <p id="confidence">진단 신뢰도 -</p>
+          </article>
+          <article class="quick-panel">
+            <div>
+              <span>선택한 예시</span>
+              <strong id="scenarioLabel">샘플</strong>
+            </div>
+            <div class="quick-cases">
+              <button type="button" data-case="highRatio">전세가율 높음</button>
+              <button type="button" data-case="trust">신탁·압류</button>
+              <button type="button" data-case="safe">확인 양호</button>
+              <button type="button" data-case="unknown">자료 부족</button>
+            </div>
+          </article>
+        </section>
+
+        <section id="step-upload" class="step-page panel">
+          <div class="section-title">
+            <p>1</p>
+            <div>
+              <h2>문서 업로드</h2>
+              <span>처음에 문서를 올리면 아래 단계에서 다시 돌아오지 않아도 됩니다.</span>
+            </div>
+          </div>
+
+          <div class="upload-grid">
+            <div>
+              <label class="drop-zone" for="documentFile">
+                <input id="documentFile" type="file" accept=".pdf,.txt,.json,.csv" />
+                <strong>PDF 또는 텍스트 파일 선택</strong>
+                <span>등기부등본, 건축물대장, 중개대상물 확인설명서</span>
+              </label>
+              <div class="file-state" id="fileState">아직 업로드한 문서가 없습니다.</div>
+            </div>
+            <div>
+              <label>
+                문서 내용 확인
+                <textarea id="documentText" name="documentText" form="riskForm" rows="8" placeholder="PDF에서 읽은 문장 또는 확인한 문구를 붙여넣을 수 있습니다."></textarea>
+              </label>
+            </div>
+          </div>
+
+          <h3 class="subheading">문서에서 찾은 신호</h3>
+          <div class="extract-grid" id="extractedSignals"></div>
+          <div class="step-actions">
+            <button type="button" class="primary" data-next="#step-contract">다음: 계약 정보 입력</button>
+          </div>
+        </section>
+
+        <form id="riskForm" class="flow-form">
+          <section id="step-contract" class="step-page panel">
+            <div class="section-title">
+              <p>2</p>
+              <div>
+                <h2>계약 정보</h2>
+                <span>사용자 입력 샘플 데이터의 모든 주요 필드를 반영했습니다.</span>
+              </div>
+            </div>
+
+            <fieldset>
+              <legend>기본 정보</legend>
+              <label class="wide">
+                주소
+                <input name="address" type="text" autocomplete="street-address" placeholder="예: 서울특별시 강서구 화곡동 1027-8" />
+              </label>
+              <div class="form-grid two">
+                <label>
+                  법정동코드
+                  <input name="legalDongCode" type="text" inputmode="numeric" placeholder="예: 1150010300" />
+                </label>
+                <label>
+                  주택유형
+                  <select name="housingType">
+                    <option>아파트</option>
+                    <option>오피스텔</option>
+                    <option>연립다세대</option>
+                    <option>다가구</option>
+                    <option>단독주택</option>
+                  </select>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>금액과 면적</legend>
+              <div class="form-grid three">
+                <label>
+                  전세보증금
+                  <input name="deposit" type="number" step="1000000" placeholder="예: 270000000" />
+                  <small>원 단위</small>
+                </label>
+                <label>
+                  월세
+                  <input name="monthlyRent" type="number" step="10000" placeholder="월세가 없으면 0" />
+                  <small>원 단위</small>
+                </label>
+                <label>
+                  전용면적
+                  <input name="area" type="number" step="0.1" placeholder="예: 42.1" />
+                  <small>m² 기준</small>
+                </label>
+              </div>
+              <div class="form-grid three">
+                <label>
+                  층
+                  <input name="floor" type="number" step="1" placeholder="예: 4" />
+                </label>
+                <label>
+                  건축연도
+                  <input name="builtYear" type="number" step="1" placeholder="예: 2016" />
+                </label>
+                <label>
+                  계약 단계
+                  <select name="contractStage">
+                    <option>매물 검토</option>
+                    <option>계약 전 확인</option>
+                    <option>계약 당일</option>
+                    <option>잔금 전 확인</option>
+                    <option>입주 직전</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                채권최고액
+                <input name="mortgageAmount" type="number" step="1000000" placeholder="근저당권이 있으면 입력" />
+                <small>업로드한 문서에서 자동 추출되면 함께 반영됩니다.</small>
+              </label>
+            </fieldset>
+
+            <div class="step-actions">
+              <button type="button" class="primary" data-next="#step-checklist">다음: 문서 확인 항목</button>
+            </div>
+          </section>
+
+          <section id="step-checklist" class="step-page panel">
+            <div class="section-title">
+              <p>3</p>
+              <div>
+                <h2>문서 확인</h2>
+                <span>업로드 문서에서 찾은 신호가 체크박스에 자동 반영되며, 직접 수정할 수 있습니다.</span>
+              </div>
+            </div>
+
+            <fieldset>
+              <legend>원본 문서 확인 여부</legend>
+              <div class="checks">
+                <label><input name="registryChecked" type="checkbox" />등기부등본 확인</label>
+                <label><input name="buildingChecked" type="checkbox" />건축물대장 확인</label>
+                <label><input name="explanationChecked" type="checkbox" />확인설명서 확인</label>
+                <label><input name="mortgageFlag" type="checkbox" />근저당권 있음</label>
+                <label><input name="seizureFlag" type="checkbox" />압류 있음</label>
+                <label><input name="provisionalSeizureFlag" type="checkbox" />가압류 있음</label>
+                <label><input name="trustFlag" type="checkbox" />신탁등기 있음</label>
+                <label><input name="leaseholdRegistrationFlag" type="checkbox" />임차권등기 있음</label>
+                <label><input name="ownershipTransferFlag" type="checkbox" />최근 소유권 이전</label>
+                <label><input name="violationFlag" type="checkbox" />위반건축물</label>
+                <label><input name="seniorDepositUnknown" type="checkbox" />다가구 선순위 보증금 미확인</label>
+              </div>
+            </fieldset>
+
+            <div class="step-actions">
+              <button type="button" class="primary" data-next="#step-market">다음: 데이터 비교</button>
+            </div>
+          </section>
+
+          <section id="step-market" class="step-page panel">
+            <div class="section-title">
+              <p>4</p>
+              <div>
+                <h2>실거래가·건축물대장 비교</h2>
+                <span>전세가율, 시세괴리율, 유사 거래 수, 건축물대장 위험 신호를 함께 확인합니다.</span>
+              </div>
+            </div>
+
+            <div class="metric-row" id="metrics"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>지역</th><th>유형</th><th>거래</th><th>금액</th><th>월세</th><th>면적</th><th>계약월</th></tr>
+                </thead>
+                <tbody id="marketRows"></tbody>
+              </table>
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="primary" data-next="#step-report">다음: 결과 리포트</button>
+            </div>
+          </section>
+
+          <section id="step-report" class="step-page panel">
+            <div class="section-title">
+              <p>5</p>
+              <div>
+                <h2>결과 리포트</h2>
+                <span>위험 신호, 근거 문서, 사용자가 바로 해야 할 행동을 묶어 보여줍니다.</span>
+              </div>
+            </div>
+
+            <div class="report-grid">
+              <section>
+                <h3 class="subheading">핵심 위험 신호</h3>
+                <div class="card-list" id="signals"></div>
+              </section>
+              <section>
+                <h3 class="subheading">다음 행동</h3>
+                <ol id="actions" class="actions"></ol>
+              </section>
+            </div>
+
+            <h3 class="subheading">RAG 근거</h3>
+            <div id="evidence" class="card-list"></div>
+
+            <details class="embedded-details" open>
+              <summary>공식 근거 자료와 공공데이터 API 보기</summary>
+              <p class="details-copy">진단에 사용한 규정, 안내문, 표준서식, 공공데이터 API의 공식 링크입니다. 원문 전체를 복제하지 않고 출처와 활용 목적을 앱 안에 함께 보존합니다.</p>
+              <div class="source-grid" id="officialSources"></div>
+            </details>
+
+            <details class="embedded-details" open>
+              <summary>제출 자료 패키지 보기</summary>
+              <p class="details-copy">백서, 데이터셋, RAG 출처 원장, API 카탈로그, 검증 문서를 Hugging Face Space 저장소 안에 함께 포함했습니다.</p>
+              <div class="source-grid" id="submissionAssets"></div>
+            </details>
+
+            <details class="embedded-details">
+              <summary>진단 처리 흐름 보기</summary>
+              <div class="process-list" id="chainView"></div>
+            </details>
+
+          </section>
+        </form>
+      </main>
+    </div>
+  </body>
+</html>

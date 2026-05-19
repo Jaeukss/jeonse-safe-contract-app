@@ -1,0 +1,6 @@
+﻿sample_id,address,legal_dong_code,housing_type,deposit_won,monthly_rent_won,has_monthly_rent,exclusive_area_m2,floor,contract_stage
+high_ratio,서울특별시 강서구 화곡동 1027-8 해솔빌라 402호,1150010300,연립다세대,270000000,0,false,42.1,4,계약 전 확인
+trust_seizure,인천광역시 미추홀구 주안동 1450-4 도담빌 301호,2817710500,연립다세대,165000000,0,false,39.2,3,잔금 전 확인
+safe_apartment,서울특별시 송파구 가락동 479 그린파크 1502호,1171010700,아파트,620000000,0,false,59.8,15,계약 전 확인
+monthly_rent_case,서울특별시 강서구 화곡동 1027-8 해솔빌라 302호,1150010300,연립다세대,160000000,350000,true,42.0,3,매물 검토
+unknown_case,서울특별시 중구 예시동 10-1,1114019900,단독주택,180000000,0,false,45.0,1,매물 검토

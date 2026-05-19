@@ -1,0 +1,46 @@
+{
+  "name": "전세계약 위험진단 MVP 데이터 전처리 원칙",
+  "version": "2026-05-17",
+  "rules": [
+    {
+      "id": "address_standardization",
+      "rule": "주소는 도로명주소, 지번주소, 법정동코드 기준으로 정리한다.",
+      "implementation": "address, road_address, legal_dong_code를 모두 보존하고 법정동코드는 문자열로 처리한다."
+    },
+    {
+      "id": "housing_type_normalization",
+      "rule": "주택유형은 아파트, 오피스텔, 연립다세대, 다가구, 단독주택 등으로 통일한다.",
+      "implementation": "원천의 다세대주택·연립주택은 MVP에서 연립다세대로 묶고, 단독주택 중 다가구는 다가구로 분리한다."
+    },
+    {
+      "id": "money_unit",
+      "rule": "금액 단위는 원 단위로 통일한다.",
+      "implementation": "price_or_deposit_won, deposit_won, monthly_rent_won, mortgage_amount_won 컬럼은 모두 원 단위 숫자다."
+    },
+    {
+      "id": "area_unit",
+      "rule": "면적 단위는 제곱미터 기준으로 통일한다.",
+      "implementation": "exclusive_area_m2를 기준 면적으로 사용한다."
+    },
+    {
+      "id": "recent_period",
+      "rule": "거래시점은 최근 1~2년 데이터를 중심으로 사용한다.",
+      "implementation": "MVP seed는 2025년 거래월 중심으로 구성했고 실제 API 수집 시 DEAL_YMD 월 단위로 확장한다."
+    },
+    {
+      "id": "similar_transaction_grouping",
+      "rule": "유사 매물은 같은 법정동, 같은 주택유형, 비슷한 전용면적, 비슷한 건축연도를 기준으로 묶는다.",
+      "implementation": "진단 엔진은 법정동 일치, 주택유형 일치, 면적 차이, 건축연도 차이에 가중치를 둔다."
+    },
+    {
+      "id": "confidence_lowering",
+      "rule": "유사 거래 건수가 부족한 경우 결과 신뢰도를 낮게 표시한다.",
+      "implementation": "유사 매매·전세 거래 합계가 6건 이상이면 높음, 4건 이상 보통, 2건 이상 낮음, 그 미만은 매우 낮음으로 본다."
+    },
+    {
+      "id": "outlier_mitigation",
+      "rule": "실거래가 이상치는 평균값보다 중앙값, IQR, Z-score 등을 활용해 완화한다.",
+      "implementation": "MVP 엔진은 중앙값 기반 m2당 가격을 사용한다. 확장판에서는 IQR 또는 Z-score 제거를 전처리 단계에 추가한다."
+    }
+  ]
+}

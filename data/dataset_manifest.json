@@ -1,0 +1,84 @@
+{
+  "project": "전세계약 위험 진단 AI Agent MVP",
+  "updated_at": "2026-05-17",
+  "note": "공식 API 인증키 없이도 심사·시연이 가능하도록 seed 데이터를 포함하고, 실제 운영 시 교체할 공식 원천 URL과 RAG 근거 문서 출처를 함께 제공한다.",
+  "datasets": [
+    {
+      "id": "user_input_samples",
+      "file": "data/user_input_samples.csv",
+      "format": "CSV",
+      "row_count": 5,
+      "fields": ["address", "legal_dong_code", "housing_type", "deposit_won", "monthly_rent_won", "has_monthly_rent", "exclusive_area_m2", "floor", "contract_stage"],
+      "mvp_role": "사용자 입력 폼 초기값과 시연 케이스",
+      "preprocessing": ["address_standardization", "housing_type_normalization", "money_unit", "area_unit"]
+    },
+    {
+      "id": "market_transactions",
+      "file": "data/market_transactions_mvp.csv",
+      "format": "CSV",
+      "row_count": 21,
+      "fields": ["region", "legal_dong_code", "housing_type", "trade_type", "trade_month", "price_or_deposit_won", "monthly_rent_won", "exclusive_area_m2", "floor", "built_year"],
+      "official_sources": [
+        "https://www.data.go.kr/data/15126474/openapi.do",
+        "https://www.data.go.kr/data/15126469/openapi.do",
+        "https://www.data.go.kr/data/15126475/openapi.do",
+        "https://www.data.go.kr/data/15126464/openapi.do",
+        "https://www.data.go.kr/data/3050988/fileData.do"
+      ],
+      "mvp_role": "전세가율, 시세괴리율, 적정 전세가와 추정 매매가 계산",
+      "preprocessing": ["recent_period", "similar_transaction_grouping", "confidence_lowering", "outlier_mitigation"]
+    },
+    {
+      "id": "building_registry",
+      "file": "data/building_registry_mvp.csv",
+      "format": "CSV",
+      "row_count": 4,
+      "fields": ["address", "road_address", "legal_dong_code", "building_name", "dong_name", "ho_name", "floor", "main_use", "exclusive_area_m2", "approval_year", "violation_flag"],
+      "official_sources": ["https://m.gov.kr/mw/AA020InfoCappView.do?CappBizCD=15000000098&HighCtgCD=A09005&tp_seq=01", "https://www.data.go.kr/dataset/15004825/openapi.do"],
+      "mvp_role": "주용도, 전유면적, 사용승인연도, 위반건축물 여부 확인",
+      "preprocessing": ["address_standardization", "area_unit", "housing_type_normalization"]
+    },
+    {
+      "id": "rag_documents",
+      "file": "data/rag_documents_mvp.json",
+      "format": "JSON",
+      "row_count": 10,
+      "fields": ["id", "title", "provider", "official_url", "document_type", "mvp_use", "risk_keys", "chunks"],
+      "official_sources": [
+        "https://www.law.go.kr/LSW/lsInfoP.do?lsId=001248",
+        "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=273341",
+        "https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp",
+        "https://www.molit.go.kr/2023safehome/main.jsp",
+        "https://moj.go.kr/moj/314/subview.do",
+        "https://housing.seoul.go.kr/site/main/content/sh05_070100"
+      ],
+      "mvp_role": "위험 진단 결과의 설명 근거와 다음 행동 생성",
+      "preprocessing": ["document_chunking", "risk_key_mapping", "source_url_preservation"]
+    },
+    {
+      "id": "rag_official_sources",
+      "file": "data/rag_official_sources.json",
+      "format": "JSON",
+      "row_count": 10,
+      "fields": ["id", "required_item", "provider", "official_url", "source_type", "source_verified_at", "mvp_usage"],
+      "mvp_role": "RAG 문서 데이터의 공식 출처 증빙과 제출용 링크 제공",
+      "preprocessing": ["official_source_verification", "source_type_tagging", "mvp_usage_mapping"]
+    },
+    {
+      "id": "submission_package",
+      "file": "data/submission_package.json",
+      "format": "JSON",
+      "row_count": 1,
+      "fields": ["project", "target", "deployment", "app_assets", "datasets", "docs", "official_source_policy"],
+      "mvp_role": "Hugging Face 배포본 안에 포함된 앱, 데이터셋, 백서, RAG 출처, API 자료 목록 제공"
+    },
+    {
+      "id": "preprocessing_rules",
+      "file": "data/preprocessing_rules.json",
+      "format": "JSON",
+      "row_count": 8,
+      "fields": ["id", "rule", "implementation"],
+      "mvp_role": "제출 문서와 구현의 데이터 전처리 기준 증빙"
+    }
+  ]
+}

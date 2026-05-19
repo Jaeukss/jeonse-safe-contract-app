@@ -1,0 +1,140 @@
+{
+  "project": "전세계약 안심진단 AI Agent",
+  "target": "2026년 국토교통 데이터활용 경진대회",
+  "deployment": {
+    "platform": "Hugging Face Spaces",
+    "sdk": "gradio",
+    "app_file": "app.py",
+    "github_repository": "https://github.com/Jaeukss/Transportation-and-Logistics-Contest"
+  },
+  "app_assets": [
+    {
+      "type": "gradio_app",
+      "title": "Hugging Face 실행형 Gradio 앱",
+      "path": "app.py"
+    },
+    {
+      "type": "backend_pipeline",
+      "title": "Python AI Agent 진단 파이프라인",
+      "path": "backend/app/pipeline.py"
+    },
+    {
+      "type": "app",
+      "title": "인앱 MVP",
+      "path": "app/index.html"
+    },
+    {
+      "type": "engine",
+      "title": "위험 진단 엔진",
+      "path": "src/risk-engine.js"
+    },
+    {
+      "type": "whitepaper",
+      "title": "프로젝트 백서",
+      "path": "docs/WHITEPAPER.md"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "user_input_samples",
+      "title": "사용자 입력 샘플 데이터",
+      "path": "data/user_input_samples.csv",
+      "xlsx_path": "data/xlsx/user_input_samples.xlsx"
+    },
+    {
+      "id": "market_transactions",
+      "title": "실거래가 MVP 데이터",
+      "path": "data/market_transactions_mvp.csv",
+      "xlsx_path": "data/xlsx/market_transactions_mvp.xlsx"
+    },
+    {
+      "id": "building_registry",
+      "title": "건축물대장 MVP 데이터",
+      "path": "data/building_registry_mvp.csv",
+      "xlsx_path": "data/xlsx/building_registry_mvp.xlsx"
+    },
+    {
+      "id": "rag_documents",
+      "title": "RAG 근거 문서 데이터",
+      "path": "data/rag_documents_mvp.json"
+    },
+    {
+      "id": "rag_official_sources",
+      "title": "RAG 공식 출처 원장",
+      "path": "data/rag_official_sources.json"
+    },
+    {
+      "id": "source_catalog",
+      "title": "공공데이터 API 원천 카탈로그",
+      "path": "data/source_catalog.json"
+    },
+    {
+      "id": "official_rag_corpus",
+      "title": "공식문서 RAG 구축 결과",
+      "path": "data/rag/official_rag_corpus.jsonl",
+      "eval_path": "data/rag/official_rag_retrieval_eval.json"
+    },
+    {
+      "id": "registry_preprocessed",
+      "title": "건축물대장 ZIP 전처리 및 구조화 검색 데이터",
+      "path": "data/registry/registry_feature_table.csv",
+      "sample_path": "data/registry/registry_records_sample.csv",
+      "search_chunks_path": "data/registry/registry_search_chunks.jsonl",
+      "eval_path": "data/registry/registry_model_eval.json"
+    },
+    {
+      "id": "market_training_artifacts",
+      "title": "시세 모델 전처리, 학습, 평가 결과",
+      "path": "data/models/market_preprocessed.csv",
+      "weights_path": "data/models/market_model_weights.json",
+      "eval_path": "data/models/market_model_eval.json"
+    }
+  ],
+  "docs": [
+    {
+      "title": "프로젝트 백서",
+      "path": "docs/WHITEPAPER.md"
+    },
+    {
+      "title": "포트폴리오 케이스 스터디",
+      "path": "docs/PORTFOLIO_CASE_STUDY.md"
+    },
+    {
+      "title": "기술 구현 설계",
+      "path": "docs/TECHNICAL_IMPLEMENTATION.md"
+    },
+    {
+      "title": "공식 RAG 출처 링크표",
+      "path": "docs/OFFICIAL_RAG_SOURCE_LINKS.md"
+    },
+    {
+      "title": "데이터셋 패키지 설명",
+      "path": "docs/DATASET_PACKAGE.md"
+    },
+    {
+      "title": "데이터 수집 설계",
+      "path": "docs/DATA_SOURCES.md"
+    },
+    {
+      "title": "AI 활용 및 데이터 사용 증빙",
+      "path": "docs/AI_USE_EVIDENCE.md"
+    },
+    {
+      "title": "진단 처리 흐름",
+      "path": "docs/LAG_CHAIN.md"
+    },
+    {
+      "title": "Hugging Face 배포 메모",
+      "path": "docs/HUGGINGFACE_DEPLOYMENT.md"
+    },
+    {
+      "title": "전처리·RAG·학습·평가 전체 파이프라인",
+      "path": "docs/END_TO_END_PIPELINE.md"
+    },
+    {
+      "title": "임차인용 앱 화면 근거 정리",
+      "path": "docs/TENANT_APP_EVIDENCE.md"
+    }
+  ],
+  "official_source_policy": "원문 전체를 복제하지 않고 공식 URL, 요약 chunk, 위험키, 활용 목적을 보존한다. 공공데이터 API는 서비스키가 필요한 경우 수집기와 원천 링크를 함께 제공한다."
+}

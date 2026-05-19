@@ -1,47 +1,72 @@
-# 전세계약 안심진단
+# 관악구 전세계약 위험진단 AI MVP
 
-임차인이 전세계약 전에 보증금, 주택 정보, 등기부등본, 건축물대장, 계약서 특이사항을 한 번에 점검할 수 있도록 만든 Streamlit MVP입니다.
+OCR이 틀리거나 문서가 없어도 체크박스 보완으로 위험진단까지 이어지는 관악구 데이터 기반 Streamlit 프로토타입입니다.
 
-## Streamlit Cloud 설정
+## 핵심 기능
 
-- Repository: `Jaeukss/jeonse-safe-contract-app`
-- Branch: `main`
-- Main file path: `app.py`
+- 관악구 전월세·매매 실거래가 전처리
+- 관악구 건축물대장 전처리
+- Raw Data Store: 사용자 입력, 체크박스, OCR, 공공데이터를 출처별 저장
+- PDF/TXT/이미지 업로드 및 텍스트 추출
+- 개인정보 마스킹
+- 등기부등본·건축물대장·중개대상물 확인설명서 필드 추출
+- 체크박스 기반 수동 보완
+- OCR/체크박스/공공데이터 충돌 감지
+- 진단 스냅샷 저장
+- 유사 거래 검색과 가격 예측 fallback
+- 전세가율·시세괴리율·시세 신뢰도 계산
+- 위험 점수·등급 산출
+- RAG 템플릿 설명과 Markdown 리포트 출력
+- LangGraph 사용 가능 시 graph 빌드, 미설치 시 순차 workflow 실행
 
-## 앱 기능
+## 실행
 
-- 업로드하면 좋은 파일과 공식 발급 위치 안내
-- 주소, 법정동코드, 주택유형, 보증금, 면적, 층, 건축연도 입력
-- 등기부등본/건축물대장/계약서 PDF 또는 TXT 업로드
-- 근저당권, 압류, 신탁등기, 위반건축물 등 위험 신호 추출
-- 주변 시세와 예측 가격 기반 전세가율·시세괴리율 계산
-- 위험등급, 위험 이유, 다음 행동, 공식 근거 링크 제공
-
-## 공식 근거 데이터
-
-앱 화면의 문서 안내와 공식 링크는 `data/tenant_action_guide.json`에 정리했습니다.
-
-주요 근거:
-
-- 대법원 인터넷등기소: `https://www.iros.go.kr/`
-- 세움터: `https://www.eais.go.kr/`
-- 법무부 자료실: `https://www.moj.go.kr/moj/315/subview.do`
-- 모바일 HUG: `https://onestop.khug.or.kr/view/biz/apply/goods001`
-- 주택임대차보호법: `https://www.law.go.kr/LSW/lsInfoP.do?lsId=001248`
-
-## 로컬 실행
-
-```bash
+```powershell
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## 폴더 구조
+현재 작업 환경에 Python이 PATH에 없다면 Codex 번들 Python 또는 로컬 Python 경로로 실행하세요.
+
+## 데이터 전처리
+
+```powershell
+python src/preprocessing/clean_trade_data.py
+python src/preprocessing/clean_building_data.py
+```
+
+산출물:
+
+- `data/processed/ganak_rent_clean.csv`
+- `data/processed/ganak_sale_clean.csv`
+- `data/processed/ganak_building_clean.csv`
+
+## 주요 구조
 
 ```text
-app.py                      Streamlit 앱 진입점
-backend/app/                진단 파이프라인, 위험 엔진, 문서 신호 추출
-data/                       MVP 실행에 필요한 근거 데이터
-docs/TENANT_APP_EVIDENCE.md 앱 화면 근거 설명
-.streamlit/config.toml      Streamlit 공공기관형 밝은 테마
+app/main.py                         Streamlit 진입점
+app/components/                     입력, 업로드, 체크박스, 충돌, 리포트 UI
+src/input_layer/                    Raw Store, 병합, 충돌 감지, 스냅샷
+src/document_ai/                    OCR 텍스트 추출, PII 마스킹, 문서 파서
+src/modeling/                       유사 거래 검색, 가격 예측 fallback
+src/risk/                           시세 지표, 권리관계 점수, 등급
+src/rag/                            위험 신호 설명 템플릿과 근거 검색
+src/agent/                          최소 Agent workflow
+src/report/                         Markdown 리포트
+tests/                              MVP 시나리오 테스트
+docs/                               발표·사업계획서용 문서
 ```
+
+## 테스트
+
+```powershell
+python scripts/run_mvp_smoke.py
+pytest tests
+```
+
+## MVP 원칙
+
+- OCR 정확도보다 입력 안정화 우선
+- 공공데이터와 OCR이 충돌하면 사용자 확인
+- 핵심 정보가 없으면 진단 신뢰도와 등급에 반영
+- 법률 판단이 아니라 위험 신호 설명과 다음 행동 안내
