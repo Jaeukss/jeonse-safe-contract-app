@@ -1,0 +1,187 @@
+[
+  {
+    "id": "housing_lease_protection_act",
+    "title": "주택임대차보호법",
+    "provider": "법제처 국가법령정보센터",
+    "official_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=001248",
+    "source_verified_at": "2026-05-17",
+    "document_type": "law",
+    "mvp_use": "대항력, 우선변제권, 확정일자, 보증금 보호 설명",
+    "risk_keys": ["unchecked", "multifamily", "jeonse_ratio"],
+    "chunks": [
+      {
+        "chunk_id": "lease_act_01",
+        "heading": "대항력과 우선변제권 확인",
+        "summary": "임차인이 보증금을 보호받기 위해서는 계약, 주택 인도, 주민등록, 확정일자 등 권리요건 확인이 중요하다.",
+        "agent_response_rule": "계약 전 등기부등본 확인과 전입·확정일자 계획을 함께 안내한다."
+      }
+    ]
+  },
+  {
+    "id": "housing_lease_protection_enforcement_decree",
+    "title": "주택임대차보호법 시행령",
+    "provider": "법제처 국가법령정보센터",
+    "official_url": "https://www.law.go.kr/법령/주택임대차보호법시행령",
+    "source_verified_at": "2026-05-17",
+    "document_type": "decree",
+    "mvp_use": "소액임차인, 보증금 보호 범위, 전월세 전환 검토 근거",
+    "risk_keys": ["multifamily", "rent_gap"],
+    "chunks": [
+      {
+        "chunk_id": "lease_decree_01",
+        "heading": "보증금 규모와 보호 범위",
+        "summary": "보증금 규모와 지역에 따라 보호 범위가 달라질 수 있으므로 보증금 수준과 지역 기준을 함께 확인한다.",
+        "agent_response_rule": "보증금이 높거나 다가구인 경우 선순위 보증금 확인을 우선 행동으로 제시한다."
+      }
+    ]
+  },
+  {
+    "id": "licensed_realtor_act",
+    "title": "공인중개사법",
+    "provider": "법제처 국가법령정보센터",
+    "official_url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=273341",
+    "source_verified_at": "2026-05-17",
+    "document_type": "law",
+    "mvp_use": "중개대상물 확인·설명 의무와 확인설명서 검토 근거",
+    "risk_keys": ["unchecked", "violation"],
+    "chunks": [
+      {
+        "chunk_id": "realtor_act_01",
+        "heading": "중개대상물 확인설명서",
+        "summary": "중개 과정에서는 권리관계, 공법상 제한, 시설 상태 등 주요 사항을 확인하고 설명해야 한다.",
+        "agent_response_rule": "확인설명서 미확인 시 진단 신뢰도를 낮추고 원본 교부 확인을 안내한다."
+      }
+    ]
+  },
+  {
+    "id": "real_estate_registration_act",
+    "title": "부동산등기법 관련 안내 자료",
+    "provider": "법제처 국가법령정보센터·대법원 인터넷등기소",
+    "official_url": "https://www.law.go.kr/법령/부동산등기법",
+    "source_verified_at": "2026-05-17",
+    "document_type": "law_guide",
+    "mvp_use": "근저당권, 압류, 가압류, 신탁등기, 소유권 이전 확인",
+    "risk_keys": ["mortgage", "seizure", "trust"],
+    "chunks": [
+      {
+        "chunk_id": "registration_01",
+        "heading": "등기부 권리관계",
+        "summary": "등기부 갑구·을구에서 소유권, 압류·가압류, 근저당권, 신탁등기 등 권리관계 위험 신호를 확인한다.",
+        "agent_response_rule": "근저당·압류·신탁 신호가 있으면 계약 보류 또는 말소·동의서 확인을 우선 제시한다."
+      }
+    ]
+  },
+  {
+    "id": "building_registry_guide",
+    "title": "건축물대장 확인 안내 자료",
+    "provider": "정부24·국토교통부",
+    "official_url": "https://m.gov.kr/mw/AA020InfoCappView.do?CappBizCD=15000000098&HighCtgCD=A09005&tp_seq=01",
+    "data_api_url": "https://www.data.go.kr/dataset/15004825/openapi.do",
+    "source_verified_at": "2026-05-17",
+    "document_type": "public_data_guide",
+    "mvp_use": "주용도, 전유면적, 사용승인연도, 위반건축물 여부 확인",
+    "risk_keys": ["violation", "unchecked"],
+    "chunks": [
+      {
+        "chunk_id": "building_01",
+        "heading": "건축물대장 주요 확인 항목",
+        "summary": "주택 용도, 면적, 사용승인일, 위반건축물 표기 여부는 보증보험과 대출 가능성 판단에 영향을 줄 수 있다.",
+        "agent_response_rule": "건축물대장 미확인 또는 위반건축물 신호가 있으면 원본 재발급과 보증 가능성 확인을 안내한다."
+      }
+    ]
+  },
+  {
+    "id": "hug_deposit_return_guarantee",
+    "title": "HUG 전세보증금반환보증 안내문",
+    "provider": "주택도시보증공사",
+    "official_url": "https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp",
+    "mobile_apply_url": "https://onestop.khug.or.kr/view/biz/apply/goods001",
+    "source_verified_at": "2026-05-17",
+    "document_type": "guarantee_guide",
+    "mvp_use": "전세가율, 보증 가능성, 보증 신청 전 확인사항 설명",
+    "risk_keys": ["jeonse_ratio", "mortgage", "violation"],
+    "chunks": [
+      {
+        "chunk_id": "hug_01",
+        "heading": "보증 가능성 사전 점검",
+        "summary": "전세보증금반환보증은 보증금, 주택, 권리관계 등 심사 조건을 확인해야 하며 추가 서류가 필요할 수 있다.",
+        "agent_response_rule": "전세가율이 높거나 선순위 권리가 있으면 HUG 보증 가능성 확인을 다음 행동으로 제시한다."
+      }
+    ]
+  },
+  {
+    "id": "molit_jeonse_fraud_checklist",
+    "title": "국토교통부 전세사기 예방 체크리스트",
+    "provider": "국토교통부",
+    "official_url": "https://www.molit.go.kr/2023safehome/main.jsp",
+    "leaflet_url": "https://www.molit.go.kr/portal/common/download/DownloadMltm2.jsp?FileName=%EC%A0%84%EC%84%B8%EA%B3%84%EC%95%BD+%EC%9C%A0%EC%9D%98%EC%82%AC%ED%95%AD+%EB%A6%AC%ED%94%8C%EB%A0%9B.pdf&FilePath=portal%2FDextUpload%2F202301%2F20230113_090421_309.pdf",
+    "source_verified_at": "2026-05-17",
+    "document_type": "checklist",
+    "mvp_use": "계약 전·계약 당일·잔금 전 확인 순서 안내",
+    "risk_keys": ["unchecked", "jeonse_ratio", "mortgage", "seizure", "trust"],
+    "chunks": [
+      {
+        "chunk_id": "molit_checklist_01",
+        "heading": "전세계약 전 기본 확인",
+        "summary": "전세사기 예방을 위해 시세, 등기부등본, 임대인, 보증보험 가능성, 특약을 단계별로 확인한다.",
+        "agent_response_rule": "계약 단계에 따라 바로 확인할 문서를 우선순위로 정렬한다."
+      }
+    ]
+  },
+  {
+    "id": "local_government_jeonse_notice",
+    "title": "지자체 전세사기 예방 안내문",
+    "provider": "서울특별시 서울주거포털",
+    "official_url": "https://housing.seoul.go.kr/site/main/content/sh05_070100",
+    "guide_pdf_url": "https://housing.seoul.go.kr/design/theme/housing/images/sub/sh05_070100/%EC%A0%84%EC%84%B8%20%EA%B3%84%EC%95%BD.%20%EB%91%90%EB%A0%B5%EC%A7%80%20%EC%95%8A%EC%95%84%EC%9A%94%20%EC%A0%84%EC%84%B8%20%EC%82%AC%EA%B8%B0%20%EC%98%88%EB%B0%A9%20A%20to%20Z.pdf",
+    "source_verified_at": "2026-05-17",
+    "document_type": "local_notice",
+    "mvp_use": "임대인 정보조회, 전세피해지원센터, 지역별 상담 안내",
+    "risk_keys": ["unchecked", "multifamily"],
+    "chunks": [
+      {
+        "chunk_id": "local_notice_01",
+        "heading": "지역 상담과 피해 예방 지원",
+        "summary": "전세계약 전 위험정보 확인과 피해 예방 상담은 지자체와 전세피해지원센터 안내를 참고한다.",
+        "agent_response_rule": "고위험 또는 검토불가 판정 시 지자체 상담과 전문가 검토를 안내한다."
+      }
+    ]
+  },
+  {
+    "id": "standard_housing_lease_contract",
+    "title": "주택임대차 표준계약서",
+    "provider": "법무부",
+    "official_url": "https://moj.go.kr/moj/314/subview.do",
+    "download_page_url": "https://www.moj.go.kr/moj/315/subview.do",
+    "source_verified_at": "2026-05-17",
+    "document_type": "contract_form",
+    "mvp_use": "특약, 임대인 계좌, 권리 변동 금지, 보증보험 협조 조건 안내",
+    "risk_keys": ["mortgage", "trust", "unchecked"],
+    "chunks": [
+      {
+        "chunk_id": "standard_contract_01",
+        "heading": "계약서 특약",
+        "summary": "권리 변동 금지, 근저당 말소, 보증보험 협조, 계약금 반환 조건 등은 계약서 특약으로 명확히 남긴다.",
+        "agent_response_rule": "위험 신호별로 계약서에 넣을 특약 방향을 다음 행동에 포함한다."
+      }
+    ]
+  },
+  {
+    "id": "property_confirmation_form",
+    "title": "중개대상물 확인설명서 양식",
+    "provider": "국토교통부·법제처",
+    "official_url": "https://www.law.go.kr/LSW/lsSideInfoP.do?docCls=jo&joNo=0016&lsiSeq=263573&urlMode=lsScJoRltInfoR",
+    "source_verified_at": "2026-05-17",
+    "document_type": "form",
+    "mvp_use": "권리관계, 공법상 제한, 시설상태, 중개 설명 여부 확인",
+    "risk_keys": ["unchecked", "violation", "mortgage"],
+    "chunks": [
+      {
+        "chunk_id": "confirmation_form_01",
+        "heading": "확인설명서 필수 검토",
+        "summary": "확인설명서는 중개대상물의 상태와 권리관계를 계약 당사자가 이해했는지 확인하는 핵심 문서다.",
+        "agent_response_rule": "확인설명서 미확인 시 신뢰도를 낮추고 서명 전 원본 확인을 안내한다."
+      }
+    ]
+  }
+]
