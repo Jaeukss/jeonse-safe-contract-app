@@ -9,6 +9,7 @@ from .schema import FieldValue
 
 SOURCE_CONFIDENCE = {
     "user_input": 1.0,
+    "manual_correction": 0.9,
     "user_checklist": 0.75,
     "registry_ocr": 0.72,
     "building_ocr": 0.72,
@@ -18,16 +19,17 @@ SOURCE_CONFIDENCE = {
 }
 
 FIELD_PRIORITY = {
-    "mortgage_flag": ["registry_ocr", "user_checklist"],
-    "mortgage_amount": ["registry_ocr", "user_checklist"],
-    "seizure_flag": ["registry_ocr", "user_checklist"],
-    "provisional_seizure_flag": ["registry_ocr", "user_checklist"],
-    "trust_flag": ["registry_ocr", "user_checklist"],
-    "leasehold_registration_flag": ["registry_ocr", "user_checklist"],
-    "violation_flag": ["public_building_data", "building_ocr", "user_checklist"],
-    "non_residential_usage_flag": ["public_building_data", "building_ocr", "user_checklist"],
+    "mortgage_flag": ["registry_ocr", "manual_correction", "user_checklist"],
+    "mortgage_amount": ["registry_ocr", "manual_correction", "user_checklist"],
+    "seizure_flag": ["registry_ocr", "manual_correction", "user_checklist"],
+    "provisional_seizure_flag": ["registry_ocr", "manual_correction", "user_checklist"],
+    "trust_flag": ["registry_ocr", "manual_correction", "user_checklist"],
+    "leasehold_registration_flag": ["registry_ocr", "manual_correction", "user_checklist"],
+    "building_register_checked": ["building_ocr", "manual_correction", "user_checklist"],
+    "violation_flag": ["public_building_data", "building_ocr", "manual_correction", "user_checklist"],
+    "non_residential_usage_flag": ["public_building_data", "building_ocr", "manual_correction", "user_checklist"],
     "deposit": ["explanation_ocr", "user_input"],
-    "area_m2": ["public_building_data", "building_ocr", "user_input"],
+    "area_m2": ["building_ocr", "user_input"],
 }
 
 

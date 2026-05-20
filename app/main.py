@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from uuid import uuid4
 
 import pandas as pd
@@ -8,14 +9,64 @@ import streamlit as st
 
 from app.components.basic_input import render_basic_input
 from app.components.conflict_view import render_conflict_view
-from app.components.document_checklist import render_document_checklist
+from app.components.document_review import render_document_review
 from app.components.document_upload import render_document_upload
 from app.components.report_view import render_report_view
 from src.agent.graph import run_agent_workflow
 from src.input_layer.raw_store import save_raw_input
 
 
+TARGET_DISTRICTS = ("관악구", "강서구")
+
+
+def _normalize_address(value: object) -> str:
+    text = str(value or "")
+    return re.sub(r"[^0-9A-Za-z가-힣]", "", text)
+
+
+def _has_specific_address(value: str) -> bool:
+    return bool(re.search(r"\d", value))
+
+
+def _to_bool(value: object) -> bool | None:
+    if pd.isna(value):
+        return None
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    if text in {"true", "1", "y", "yes", "위반"}:
+        return True
+    if text in {"false", "0", "n", "no", ""}:
+        return False
+    return None
+
+
+def _match_score(user_address: str, row: pd.Series) -> int:
+    normalized_user = _normalize_address(user_address)
+    addresses = [
+        _normalize_address(row.get("address_normalized")),
+        _normalize_address(row.get("road_address")),
+    ]
+    if not normalized_user:
+        return 0
+    for address in addresses:
+        if not address:
+            continue
+        if normalized_user in address or address in normalized_user:
+            return 100
+
+    tokens = [token for token in re.split(r"\s+", user_address.strip()) if len(token) >= 2]
+    score = 0
+    joined = " ".join(str(row.get(column, "")) for column in ["address_normalized", "road_address"])
+    for token in tokens:
+        if token in joined:
+            score += 10
+    return score
+
+
 def match_public_building(address: str) -> dict[str, object] | None:
+    if not _has_specific_address(address):
+        return None
     path = "data/processed/ganak_building_clean.csv"
     try:
         df = pd.read_csv(path)
@@ -23,15 +74,22 @@ def match_public_building(address: str) -> dict[str, object] | None:
         return None
     if df.empty:
         return None
-    candidates = df[df["address_normalized"].astype(str).apply(lambda value: any(token in address for token in value.split()[-3:]))]
-    row = candidates.iloc[0] if not candidates.empty else df.iloc[0]
+
+    df = df.copy()
+    df["_match_score"] = df.apply(lambda row: _match_score(address, row), axis=1)
+    candidates = df[df["_match_score"].ge(30)].sort_values("_match_score", ascending=False)
+    if candidates.empty:
+        return None
+
+    row = candidates.iloc[0]
+    main_usage = "" if pd.isna(row.get("main_usage")) else str(row.get("main_usage"))
     return {
-        "area_m2": float(row["area_m2"]) if pd.notna(row["area_m2"]) else None,
-        "approval_year": int(row["approval_year"]) if pd.notna(row["approval_year"]) else None,
-        "violation_flag": bool(row["violation_flag"]),
-        "main_usage": row["main_usage"],
-        "building_register_checked": True,
-        "non_residential_usage_flag": "주택" not in str(row["main_usage"]),
+        "public_building_matched": True,
+        "public_building_gross_area_m2": float(row["area_m2"]) if pd.notna(row.get("area_m2")) else None,
+        "approval_year": int(row["approval_year"]) if pd.notna(row.get("approval_year")) else None,
+        "violation_flag": _to_bool(row.get("violation_flag")),
+        "main_usage": main_usage or None,
+        "non_residential_usage_flag": ("주택" not in main_usage) if main_usage else None,
     }
 
 
@@ -41,9 +99,9 @@ def run_diagnosis(session_id: str, records: list[dict[str, object]], resolutions
 
 
 def main() -> None:
-    st.set_page_config(page_title="관악구 전세계약 위험진단 MVP", page_icon="🏠", layout="wide")
-    st.title("관악구 전세계약 위험진단 MVP")
-    st.caption("OCR이 틀려도 사용자 입력으로 보완해 진단까지 이어지는 입력 안정화 프로토타입")
+    st.set_page_config(page_title="전세계약 위험진단 MVP", page_icon="H", layout="wide")
+    st.title("전세계약 위험진단 MVP")
+    st.caption("OCR 텍스트 추출 후 실패·불확실 항목은 사용자 수기 입력과 선택지 입력으로 보완합니다.")
 
     if "session_id" not in st.session_state:
         st.session_state.session_id = f"S-{uuid4().hex[:8].upper()}"
@@ -51,18 +109,18 @@ def main() -> None:
 
     with st.form("diagnosis_form"):
         basic = render_basic_input(st)
-        checklist = render_document_checklist(st)
+        manual_correction = render_document_review(st)
         submitted = st.form_submit_button("입력 저장", type="primary", use_container_width=True)
 
     upload_records = render_document_upload(st, session_id)
 
     if submitted:
-        if "관악" not in basic["address"]:
-            st.error("이번 MVP는 관악구 주소만 지원합니다.")
+        if not any(district in basic["address"] for district in TARGET_DISTRICTS):
+            st.error("이번 MVP는 관악구 또는 강서구 주소만 지원합니다.")
             return
         records: list[dict[str, object]] = []
         records.append(save_raw_input(session_id, "user_input", basic))
-        records.append(save_raw_input(session_id, "user_checklist", checklist))
+        records.append(save_raw_input(session_id, "manual_correction", manual_correction))
         public_building = match_public_building(basic["address"])
         if public_building:
             records.append(save_raw_input(session_id, "public_building_data", public_building))

@@ -13,6 +13,7 @@ OCR_RESULT_DIR = ROOT / "data" / "ocr_results"
 
 RawSource = Literal[
     "user_input",
+    "manual_correction",
     "user_checklist",
     "registry_ocr",
     "building_ocr",

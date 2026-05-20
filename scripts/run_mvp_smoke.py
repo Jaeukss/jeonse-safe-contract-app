@@ -36,7 +36,7 @@ def main() -> None:
         {
             "mortgage_flag": [
                 {"value": True, "source": "registry_ocr", "confidence": 0.8},
-                {"value": False, "source": "user_checklist", "confidence": 0.75},
+                {"value": False, "source": "manual_correction", "confidence": 0.9},
             ]
         }
     )
@@ -84,7 +84,7 @@ def main() -> None:
         {
             "input_id": "RAW-2",
             "session_id": "S-SMOKE",
-            "source": "user_checklist",
+            "source": "manual_correction",
             "data": {
                 "registry_checked": True,
                 "building_register_checked": True,

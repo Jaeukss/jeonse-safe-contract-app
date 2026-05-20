@@ -58,7 +58,7 @@ def calculate_risk_score(snapshot: dict[str, Any], market: dict[str, Any]) -> tu
     if not snapshot.get("registry_checked"):
         score += 20
         add_signal(signals, 20, "registry_unchecked", "등기부등본 미확인", "근저당, 압류, 신탁 여부를 판단할 수 없습니다.")
-    if not snapshot.get("building_register_checked"):
+    if not snapshot.get("building_register_checked") and not snapshot.get("public_building_matched"):
         score += 15
         add_signal(signals, 15, "building_unchecked", "건축물대장 미확인", "위반건축물 및 용도 확인이 제한됩니다.")
     if not snapshot.get("broker_explanation_checked"):

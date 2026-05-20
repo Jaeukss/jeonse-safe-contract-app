@@ -22,7 +22,7 @@ def test_agent_workflow_creates_report(tmp_path, monkeypatch):
         {
             "input_id": "RAW-2",
             "session_id": "S-TEST",
-            "source": "user_checklist",
+            "source": "manual_correction",
             "data": {
                 "registry_checked": True,
                 "building_register_checked": True,

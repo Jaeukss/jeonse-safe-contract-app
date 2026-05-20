@@ -11,6 +11,13 @@ OUTPUT = ROOT / "artifacts" / "gwanak_gangseo_final_used_files.zip"
 
 EXPLICIT_FILES = [
     "artifacts/gwanak_gangseo_processing_report.json",
+    "app.py",
+    "app/main.py",
+    "app/components/basic_input.py",
+    "app/components/conflict_view.py",
+    "app/components/document_review.py",
+    "app/components/document_upload.py",
+    "app/components/report_view.py",
     "data/models/best_price_model_seoul_multi_year.json",
     "data/models/gwanak_gangseo_price_model_eval.json",
     "data/models/selected_price_model_summary.json",

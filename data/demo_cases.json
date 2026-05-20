@@ -13,11 +13,16 @@
       "registry_text": "등기사항전부증명서 갑구 을구 권리관계 해당없음",
       "building_text": "건축물대장 주용도 단독주택 사용승인일 2004 위반건축물 해당없음"
     },
+    "manual_correction": {
+      "mortgage_flag": false,
+      "seizure_flag": false,
+      "trust_flag": false
+    },
     "expected": "현재 확인된 정보 기준 위험 신호가 적음"
   },
   {
     "case_id": "CASE-2",
-    "title": "OCR 실패 + 체크박스 보완",
+    "title": "OCR 실패 + 사용자 보완 입력",
     "input": {
       "address": "서울시 관악구 신림동",
       "housing_type": "다가구",
@@ -25,7 +30,7 @@
       "area_m2": 27.1,
       "floor": 2
     },
-    "checklist": {
+    "manual_correction": {
       "mortgage_flag": false,
       "seizure_flag": false,
       "trust_flag": null
@@ -34,7 +39,7 @@
   },
   {
     "case_id": "CASE-3",
-    "title": "OCR과 체크박스 충돌",
+    "title": "OCR과 사용자 보완 입력 충돌",
     "input": {
       "address": "서울시 관악구 신림동",
       "housing_type": "다가구",
@@ -45,10 +50,10 @@
     "ocr": {
       "mortgage_flag": true
     },
-    "checklist": {
+    "manual_correction": {
       "mortgage_flag": false
     },
-    "expected": "충돌 감지 후 사용자 확인"
+    "expected": "충돌 감지 후 사용자 최종 확인"
   },
   {
     "case_id": "CASE-4",
@@ -63,7 +68,7 @@
     "ocr": {
       "trust_flag": true
     },
-    "checklist": {
+    "manual_correction": {
       "senior_deposit_checked": false
     },
     "expected": "고위험, 수탁자 동의 여부와 선순위 임차보증금 확인 안내"

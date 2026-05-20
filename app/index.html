@@ -27,7 +27,7 @@
         <nav class="side-nav" aria-label="단계 이동">
           <a class="active" href="#step-upload" data-section-link><span>1</span>문서 업로드</a>
           <a href="#step-contract" data-section-link><span>2</span>계약 정보</a>
-          <a href="#step-checklist" data-section-link><span>3</span>문서 확인</a>
+          <a href="#step-review" data-section-link><span>3</span>OCR 확인·보완</a>
           <a href="#step-market" data-section-link><span>4</span>데이터 비교</a>
           <a href="#step-report" data-section-link><span>5</span>결과 리포트</a>
         </nav>
@@ -190,21 +190,21 @@
             </fieldset>
 
             <div class="step-actions">
-              <button type="button" class="primary" data-next="#step-checklist">다음: 문서 확인 항목</button>
+              <button type="button" class="primary" data-next="#step-review">다음: OCR 확인·보완</button>
             </div>
           </section>
 
-          <section id="step-checklist" class="step-page panel">
+          <section id="step-review" class="step-page panel">
             <div class="section-title">
               <p>3</p>
               <div>
-                <h2>문서 확인</h2>
-                <span>업로드 문서에서 찾은 신호를 사용자 입력으로 보완하고 직접 확정할 수 있습니다.</span>
+                <h2>OCR 결과 확인 및 보완</h2>
+                <span>OCR 텍스트 추출 실패 또는 불확실 항목은 수기 입력과 선택지 입력으로 보완합니다.</span>
               </div>
             </div>
 
             <fieldset>
-              <legend>원본 문서 확인 여부</legend>
+              <legend>사용자 보완 입력</legend>
               <div class="checks">
                 <label><input name="registryChecked" type="checkbox" />등기부등본 확인</label>
                 <label><input name="buildingChecked" type="checkbox" />건축물대장 확인</label>
