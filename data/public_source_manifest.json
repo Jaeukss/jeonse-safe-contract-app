@@ -1,0 +1,182 @@
+{
+  "project": "관악구 전세계약 위험진단 Streamlit MVP",
+  "checked_at": "2026-05-20",
+  "region_scope": {
+    "district": "서울특별시 관악구",
+    "lawd_cd": "11620",
+    "legal_dongs": [
+      {
+        "code": "1162010100",
+        "name": "봉천동"
+      },
+      {
+        "code": "1162010200",
+        "name": "신림동"
+      },
+      {
+        "code": "1162010300",
+        "name": "남현동"
+      }
+    ],
+    "source": "https://www.code.go.kr/stdcode/regCodeL.do"
+  },
+  "secured_sources": [
+    {
+      "id": "rtms_csv_download",
+      "name": "국토교통부 실거래가 공개시스템 조건별 자료제공",
+      "provider": "국토교통부",
+      "url": "https://rt.molit.go.kr/pt/xls/xls.do?mobileAt=",
+      "secured_item": "CSV/Excel 수동 다운로드 경로와 유의사항",
+      "data_access": "manual_download",
+      "mvp_use": "API 인증키가 없을 때 관악구 실거래가 CSV를 수동 확보"
+    },
+    {
+      "id": "rtms_file_metadata",
+      "name": "국토교통부_실거래가 정보",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/data/3050988/fileData.do",
+      "secured_item": "파일데이터 메타데이터와 원천 다운로드 안내",
+      "data_access": "manual_download",
+      "mvp_use": "실거래가 데이터 출처 증빙"
+    },
+    {
+      "id": "apt_rent_api",
+      "name": "국토교통부_아파트 전월세 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/data/15126474/openapi.do",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "아파트 전세/월세 유사거래"
+    },
+    {
+      "id": "apt_trade_api",
+      "name": "국토교통부_아파트 매매 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/data/15126469/openapi.do",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "아파트 매매가 기준값"
+    },
+    {
+      "id": "rh_rent_api",
+      "name": "국토교통부_연립다세대 전월세 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126473",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcRHRent/getRTMSDataSvcRHRent",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "연립다세대 전세/월세 유사거래"
+    },
+    {
+      "id": "rh_trade_api",
+      "name": "국토교통부_연립다세대 매매 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126467",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcRHTrade/getRTMSDataSvcRHTrade",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "연립다세대 매매가 기준값"
+    },
+    {
+      "id": "sh_rent_api",
+      "name": "국토교통부_단독/다가구 전월세 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126472",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcSHRent/getRTMSDataSvcSHRent",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "단독/다가구 전세/월세 유사거래"
+    },
+    {
+      "id": "sh_trade_api",
+      "name": "국토교통부_단독/다가구 매매 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126465",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcSHTrade/getRTMSDataSvcSHTrade",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "단독/다가구 매매가 기준값"
+    },
+    {
+      "id": "offi_rent_api",
+      "name": "국토교통부_오피스텔 전월세 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/data/15126475/openapi.do",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcOffiRent/getRTMSDataSvcOffiRent",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "오피스텔 전세/월세 유사거래"
+    },
+    {
+      "id": "offi_trade_api",
+      "name": "국토교통부_오피스텔 매매 실거래가 자료",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/data/15126464/openapi.do",
+      "endpoint": "https://apis.data.go.kr/1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade",
+      "data_access": "requires_data_go_kr_service_key",
+      "params": ["serviceKey", "LAWD_CD", "DEAL_YMD", "pageNo", "numOfRows"],
+      "mvp_use": "오피스텔 매매가 기준값"
+    },
+    {
+      "id": "building_registry",
+      "name": "국토교통부_건축물대장정보 서비스",
+      "provider": "국토교통부",
+      "url": "https://www.data.go.kr/dataset/15004825/openapi.do?lang=ko",
+      "endpoint": "https://apis.data.go.kr/1613000/BldRgstService_v2/getBrTitleInfo",
+      "data_access": "requires_data_go_kr_service_key_or_manual_document",
+      "params": ["serviceKey", "sigunguCd", "bjdongCd", "platGbCd", "bun", "ji", "pageNo", "numOfRows"],
+      "mvp_use": "주용도, 사용승인일, 면적, 위반건축물 여부 확인"
+    },
+    {
+      "id": "molit_jeonse_checklist",
+      "name": "전세계약 유의사항",
+      "provider": "국토교통부",
+      "url": "https://www.molit.go.kr/USR/policyData/m_34681/dtl.jsp?id=4679",
+      "pdf_url": "https://www.molit.go.kr/portal/common/download/DownloadMltm2.jsp?FileName=%EC%A0%84%EC%84%B8%EA%B3%84%EC%95%BD+%EC%9C%A0%EC%9D%98%EC%82%AC%ED%95%AD+%EB%A6%AC%ED%94%8C%EB%A0%9B.pdf&FilePath=portal%2FDextUpload%2F202301%2F20230113_090421_309.pdf",
+      "data_access": "public_document",
+      "mvp_use": "리포트 체크리스트와 다음 행동 설명"
+    },
+    {
+      "id": "safe_home",
+      "name": "국토교통부 안전한 집",
+      "provider": "국토교통부",
+      "url": "https://www.molit.go.kr/2023safehome/main.jsp",
+      "data_access": "public_web",
+      "mvp_use": "전세사기 예방 설명 템플릿"
+    },
+    {
+      "id": "standard_contract",
+      "name": "주택임대차표준계약서",
+      "provider": "법무부",
+      "url": "https://moj.go.kr/moj/314/subview.do",
+      "data_access": "public_document",
+      "mvp_use": "계약서 확인 항목과 계약 전 행동"
+    },
+    {
+      "id": "housing_lease_law",
+      "name": "주택임대차보호법",
+      "provider": "법제처 국가법령정보센터",
+      "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=183533",
+      "data_access": "public_law",
+      "mvp_use": "대항력, 우선변제권 등 설명 근거"
+    },
+    {
+      "id": "hug_return_guarantee",
+      "name": "전세보증금반환보증 가입",
+      "provider": "주택도시보증공사",
+      "url": "https://onestop.khug.or.kr/webView/webBiz/apply/goods001",
+      "data_access": "public_web",
+      "mvp_use": "전세보증금반환보증 안내"
+    }
+  ],
+  "remaining_user_inputs": [
+    "공공데이터포털 API serviceKey",
+    "관악구 최근 24~36개월 실거래가 CSV 또는 API 수집 결과",
+    "실제 건축물대장 원천 데이터 또는 익명화 샘플",
+    "익명화된 등기부등본/건축물대장/중개대상물 확인설명서 PDF 또는 이미지 10~30건",
+    "위험 점수표와 등급 기준에 대한 전문가 검토 의견",
+    "실제 사용자 리포트 문구 피드백"
+  ]
+}

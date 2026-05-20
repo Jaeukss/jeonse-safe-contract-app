@@ -1,46 +1,54 @@
-# 데이터 수집 설계
+# 데이터 소스 수집 설계
 
-이 MVP에는 앱에서 즉시 실행 가능한 seed 데이터와, 실제 공공데이터를 수집하기 위한 원천 카탈로그·수집기가 함께 들어 있다.
+이 MVP는 발표와 스모크 테스트가 바로 가능하도록 seed 데이터를 포함한다. 실제 운영 또는 실증 단계에서는 아래 공식 출처에서 관악구 원천 데이터를 확보해 seed 파일을 교체해야 한다.
 
-## 현재 담긴 데이터
+## 현재 포함된 데이터
 
-- `data/seed_market.csv`: 실거래가 API 구조에 맞춘 시연용 전월세·매매 데이터
-- `data/seed_building_registry.csv`: 건축물대장 표제부 구조에 맞춘 시연용 건축물 데이터
-- `data/rag_knowledge.json`: 위험 신호별 설명 근거
-- `data/source_catalog.json`: 공식 원천, API endpoint, 인증 방식, 주요 필드, MVP 활용 위치
-- `data/rag_official_sources.json`: RAG 문서 데이터 10종의 공식 출처, 확인일, MVP 활용 목적
+- `data/market_transactions_mvp.csv`: 시연용 실거래가 seed 데이터
+- `data/building_registry_mvp.csv`: 시연용 건축물대장 seed 데이터
+- `data/rag_knowledge.json`: 위험 신호별 설명 템플릿
+- `data/public_source_manifest.json`: 공식 출처, API endpoint, 인증 방식, MVP 사용처
+- `docs/DATA_ACQUISITION_STATUS.md`: 확보 완료 출처와 남은 요청자료
 
 ## 공식 원천
 
-1. 국토교통부 실거래가 공개시스템 및 공공데이터포털 RTMS API
-2. 국토교통부 건축물대장 표제부 API
-3. 법제처 국가법령정보센터 주택임대차보호법·시행령
-4. HUG 전세보증금반환보증 상품 안내
-5. 법무부 주택임대차 표준계약서
-6. 정부24 건축물대장 등본·초본 발급·열람 안내
-7. 서울주거포털 전세사기 피해 예방·지원 안내
-8. 행정표준코드관리시스템 법정동코드
+1. [국토교통부 실거래가 공개시스템 자료제공](https://rt.molit.go.kr/pt/xls/xls.do?mobileAt=)
+2. [국토교통부_실거래가 정보](https://www.data.go.kr/data/3050988/fileData.do)
+3. [국토교통부_아파트 전월세 실거래가 자료](https://www.data.go.kr/data/15126474/openapi.do)
+4. [국토교통부_아파트 매매 실거래가 자료](https://www.data.go.kr/data/15126469/openapi.do)
+5. [국토교통부_연립다세대 전월세 실거래가 자료](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126473)
+6. [국토교통부_연립다세대 매매 실거래가 자료](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126467)
+7. [국토교통부_단독/다가구 전월세 실거래가 자료](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126472)
+8. [국토교통부_단독/다가구 매매 실거래가 자료](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15126465)
+9. [국토교통부_오피스텔 전월세 실거래가 자료](https://www.data.go.kr/data/15126475/openapi.do)
+10. [국토교통부_오피스텔 매매 실거래가 자료](https://www.data.go.kr/data/15126464/openapi.do)
+11. [국토교통부_건축물대장정보 서비스](https://www.data.go.kr/dataset/15004825/openapi.do?lang=ko)
+12. [행정표준코드관리시스템 법정동코드목록조회](https://www.code.go.kr/stdcode/regCodeL.do)
+13. [국토교통부 전세계약 유의사항](https://www.molit.go.kr/USR/policyData/m_34681/dtl.jsp?id=4679)
+14. [국토교통부 안전한 집](https://www.molit.go.kr/2023safehome/main.jsp)
+15. [법무부 주택임대차표준](https://moj.go.kr/moj/314/subview.do)
+16. [국가법령정보센터 주택임대차보호법](https://www.law.go.kr/lsInfoP.do?lsiSeq=183533)
+17. [HUG 전세보증금반환보증 가입](https://onestop.khug.or.kr/webView/webBiz/apply/goods001)
+18. [인터넷등기소](https://www.iros.go.kr/)
+19. [정부24](https://www.gov.kr/)
+20. [세움터](https://www.eais.go.kr/)
 
 ## 수집 방법
 
-공공데이터포털 인증키를 발급한 뒤 다음처럼 실행한다.
+공공데이터포털 인증키를 발급받은 뒤 다음처럼 실행한다.
 
 ```powershell
 $env:DATA_GO_KR_SERVICE_KEY="발급받은_인증키"
-python scripts/collect_public_data.py --lawd-cd 11500 --months 202511 202512
+python scripts/collect_public_data.py --lawd-cd 11620 --months 202401 202402 202403
 ```
 
-결과는 다음 경로에 저장된다.
+결과 저장 경로:
 
 - 원문 XML: `data/raw/`
 - 정규화 CSV: `data/processed/`
 
-## 왜 seed 데이터도 포함하는가
+API 키가 없으면 국토교통부 실거래가 공개시스템에서 관악구 CSV를 직접 내려받아 `data/raw/trade/`에 넣고 전처리한다.
 
-공식 API는 무료지만 공공데이터포털 활용신청과 인증키가 필요하다. 심사 환경에서 인증키 없이도 인앱 데모와 LAG 체인을 검증할 수 있도록 seed 데이터를 포함했고, 실제 배포 시에는 수집기로 원천 데이터를 교체한다.
+## 남은 자료
 
-## 제출 시 같이 제시할 파일
-
-- 공식 RAG 링크표: `docs/OFFICIAL_RAG_SOURCE_LINKS.md`
-- RAG 출처 원장: `data/rag_official_sources.json`
-- 데이터셋 매니페스트: `data/dataset_manifest.json`
+남은 자료는 [DATA_ACQUISITION_STATUS.md](./DATA_ACQUISITION_STATUS.md)의 "추가로 남은 요청자료"에만 정리했다.
