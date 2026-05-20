@@ -33,7 +33,7 @@ def build_document_signal_cards(fields: dict[str, Any]) -> list[dict[str, Any]]:
                 "key": key,
                 "label": label,
                 "status": status_from_value(fields.get(key), checked),
-                "source": "OCR/체크박스 병합",
+                "source": "OCR/사용자 입력 병합",
                 "confidence": fields.get(f"{key}_confidence"),
             }
         )

@@ -43,7 +43,7 @@ def run_diagnosis(session_id: str, records: list[dict[str, object]], resolutions
 def main() -> None:
     st.set_page_config(page_title="관악구 전세계약 위험진단 MVP", page_icon="🏠", layout="wide")
     st.title("관악구 전세계약 위험진단 MVP")
-    st.caption("OCR이 틀려도 체크박스로 보완해 진단까지 이어지는 입력 안정화 프로토타입")
+    st.caption("OCR이 틀려도 사용자 입력으로 보완해 진단까지 이어지는 입력 안정화 프로토타입")
 
     if "session_id" not in st.session_state:
         st.session_state.session_id = f"S-{uuid4().hex[:8].upper()}"

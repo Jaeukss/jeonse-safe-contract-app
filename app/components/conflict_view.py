@@ -7,7 +7,7 @@ def render_conflict_view(st: Any, conflicts: list[dict[str, Any]]) -> dict[str, 
     if not conflicts:
         return {}
     st.subheader("4. 충돌 확인")
-    st.warning("OCR/체크박스/사용자 입력 사이에 다른 값이 발견되었습니다. 진단에 사용할 값을 선택하세요.")
+    st.warning("OCR/사용자 보완 입력/기본 입력 사이에 다른 값이 발견되었습니다. 진단에 사용할 값을 선택하세요.")
     resolutions: dict[str, Any] = {}
     for conflict in conflicts:
         field = conflict["field"]

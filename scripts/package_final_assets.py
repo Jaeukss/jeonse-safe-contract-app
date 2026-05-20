@@ -11,13 +11,17 @@ OUTPUT = ROOT / "artifacts" / "gwanak_gangseo_final_used_files.zip"
 
 EXPLICIT_FILES = [
     "artifacts/gwanak_gangseo_processing_report.json",
-    "data/models/best_price_model_seoul_1y.json",
+    "data/models/best_price_model_seoul_multi_year.json",
     "data/models/gwanak_gangseo_price_model_eval.json",
     "data/models/selected_price_model_summary.json",
-    "data/models/seoul_1y_ml_dl_benchmark_summary.json",
+    "data/models/seoul_multi_year_ml_dl_benchmark_summary.json",
     "docs/MODELING_AND_DATA_REPORT.md",
+    "docs/01_mvp_scope.md",
+    "docs/business_plan_workflow.md",
     "docs/DATA_ACQUISITION_STATUS.md",
     "docs/DATA_SOURCES.md",
+    "docs/demo_script.md",
+    "docs/final_architecture.md",
     "docs/OFFICIAL_RAG_SOURCE_LINKS.md",
     "scripts/build_gwanak_gangseo_assets.py",
     "scripts/benchmark_price_models.py",
@@ -64,7 +68,7 @@ def main() -> None:
         "included_files": [path.relative_to(ROOT).as_posix() for path in files],
         "excluded": [
             "raw source ZIP/PDF/DOC files",
-            "full benchmark payload file seoul_1y_ml_dl_benchmark.json",
+            "full benchmark payload files with candidate model tables",
             "legacy sample-only model artifacts",
         ],
     }

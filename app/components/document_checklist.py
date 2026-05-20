@@ -4,7 +4,7 @@ from typing import Any
 
 
 def render_document_checklist(st: Any) -> dict[str, Any]:
-    st.subheader("3. 체크박스 보완")
+    st.subheader("3. 사용자 입력 보완")
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("**등기부등본 확인**")

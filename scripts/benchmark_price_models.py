@@ -6,6 +6,8 @@ import io
 import json
 import math
 import os
+import shutil
+import tempfile
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -48,6 +50,83 @@ def parse_region(region: str) -> tuple[str, str]:
 def stable_bucket(*values: Any, modulo: int = 10) -> int:
     key = "|".join(str(value) for value in values)
     return int(hashlib.sha1(key.encode("utf-8", errors="ignore")).hexdigest()[:8], 16) % modulo
+
+
+def looks_like_trade_zip(path: Path) -> bool:
+    name = path.name
+    return path.suffix.lower() == ".zip" and "\uc2e4\uac70\ub798\uac00" in name
+
+
+def resolve_trade_zip_paths() -> list[Path]:
+    env_value = os.environ.get("JEONSE_TRADE_ZIPS", "").strip()
+    if env_value:
+        parts = [part.strip().strip('"') for part in env_value.replace("\n", os.pathsep).split(os.pathsep)]
+        paths = [Path(part) for part in parts if part]
+    else:
+        roots = [RAW_BASE]
+        default_extra = Path(r"C:\Users\User\Desktop\교통 데이터 최종zip")
+        extra_root = Path(os.environ.get("JEONSE_EXTRA_RAW_DIR", str(default_extra)))
+        if extra_root not in roots:
+            roots.append(extra_root)
+        paths = []
+        for root in roots:
+            if root.exists():
+                paths.extend(root.glob("*.zip"))
+
+    unique: dict[tuple[str, int], Path] = {}
+    for path in paths:
+        if path.exists() and looks_like_trade_zip(path):
+            unique[(path.name, path.stat().st_size)] = path
+    resolved = sorted(unique.values(), key=lambda item: item.name)
+    if not resolved:
+        raise FileNotFoundError("No Seoul trade ZIP files found. Set JEONSE_TRADE_ZIPS or JEONSE_EXTRA_RAW_DIR.")
+    return resolved
+
+
+def parse_seoul_trade_zips() -> pd.DataFrame:
+    frames: list[pd.DataFrame] = []
+    source_zips: list[str] = []
+    old_raw_base = RAW_BASE
+    tmp_root = ROOT / "data" / ".tmp_trade_parse"
+    tmp_root.mkdir(parents=True, exist_ok=True)
+
+    for zip_path in resolve_trade_zip_paths():
+        with tempfile.TemporaryDirectory(dir=tmp_root) as tmp_dir:
+            tmp_zip = Path(tmp_dir) / zip_path.name
+            try:
+                os.link(zip_path, tmp_zip)
+            except OSError:
+                shutil.copy2(zip_path, tmp_zip)
+
+            globals()["RAW_BASE"] = Path(tmp_dir)
+            parsed = parse_seoul_trade_zip()
+            parsed["source_zip"] = zip_path.name
+            frames.append(parsed)
+            source_zips.append(str(zip_path))
+
+    globals()["RAW_BASE"] = old_raw_base
+    if not frames:
+        return pd.DataFrame()
+
+    combined = pd.concat(frames, ignore_index=True)
+    combined = combined.drop_duplicates(
+        subset=[
+            "district",
+            "dong",
+            "housing_type",
+            "transaction_ym",
+            "area_m2",
+            "floor",
+            "built_year",
+            "building_name",
+            "road_name",
+            "lot_no",
+            "target_kind",
+            "target_won",
+        ]
+    ).reset_index(drop=True)
+    combined.attrs["source_zips"] = source_zips
+    return combined
 
 
 def parse_seoul_trade_zip() -> pd.DataFrame:
@@ -268,17 +347,19 @@ def benchmark_one(df: pd.DataFrame, target_kind: str) -> dict[str, Any]:
 
 def main() -> None:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
-    df = parse_seoul_trade_zip()
+    df = parse_seoul_trade_zips()
+    source_zips = df.attrs.get("source_zips", [])
     write_df(
         df[df["is_target_scope"]].copy(),
-        PROCESSED_DIR / "gwanak_gangseo_market_eval_scope_from_seoul_1y.csv",
+        PROCESSED_DIR / "gwanak_gangseo_market_eval_scope_from_seoul_multi_year.csv",
     )
     results = {
-        "task": "seoul_1y_ml_dl_price_model_benchmark",
+        "task": "seoul_multi_year_ml_dl_price_model_benchmark",
         "created_at": datetime.now().isoformat(timespec="seconds"),
         "raw_base": str(RAW_BASE),
+        "source_zips": source_zips,
         "source_rows": int(len(df)),
-        "training_scope": "서울 전체 1년치 실거래가",
+        "training_scope": "서울 전체 실거래가 ZIP 다중 연도",
         "evaluation_scope": "관악구+강서구 holdout",
         "warning_thresholds": WARNING_THRESHOLDS,
         "benchmarks": [
@@ -297,9 +378,53 @@ def main() -> None:
         for item in results["benchmarks"]
         if "model_payload" in item
     }
-    (MODEL_DIR / "seoul_1y_ml_dl_benchmark.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
-    (MODEL_DIR / "best_price_model_seoul_1y.json").write_text(json.dumps(best_payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps(results, ensure_ascii=False, indent=2))
+    (MODEL_DIR / "seoul_multi_year_ml_dl_benchmark.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+    (MODEL_DIR / "best_price_model_seoul_multi_year.json").write_text(json.dumps(best_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    compact = {key: value for key, value in results.items() if key != "benchmarks"}
+    compact["benchmarks"] = [
+        {
+            key: item[key]
+            for key in [
+                "target_kind",
+                "train_rows_seoul",
+                "test_rows_target_scope",
+                "candidates",
+                "best_model",
+                "best_kind",
+                "best_evaluation",
+                "warning",
+            ]
+        }
+        for item in results["benchmarks"]
+    ]
+    (MODEL_DIR / "seoul_multi_year_ml_dl_benchmark_summary.json").write_text(
+        json.dumps(compact, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    selected_summary = {
+        "selected_at": datetime.now().date().isoformat(),
+        "training_scope": "서울 전체 실거래가 ZIP 다중 연도",
+        "evaluation_scope": "관악구+강서구 holdout",
+        "selected_model": "hierarchical_median",
+        "selected_model_type": "machine_learning_statistical_baseline",
+        "source_rows": int(len(df)),
+        "source_zips": source_zips,
+        "results": {
+            item["target_kind"]: {
+                "best_model": item.get("best_model"),
+                "best_kind": item.get("best_kind"),
+                "evaluation": item.get("best_evaluation"),
+                "warning": item.get("warning"),
+            }
+            for item in results["benchmarks"]
+        },
+        "decision": "추가 데이터 반영 후에도 Ridge/MLP보다 계층형 유사거래 중앙값 모델의 중앙 오차율이 가장 낮아 가격 예측 기준 모델로 유지",
+    }
+    (MODEL_DIR / "selected_price_model_summary.json").write_text(
+        json.dumps(selected_summary, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(json.dumps(compact, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

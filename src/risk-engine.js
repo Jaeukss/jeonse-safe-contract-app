@@ -312,7 +312,7 @@
     ]))).slice(0, 6);
 
     const chain = [
-      { id: "load", name: "Load", label: "사용자 입력·PDF 문서 로드", status: "done", detail: parsed.extractedChars ? `문서 텍스트 ${parsed.extractedChars}자 반영` : "체크박스/직접입력 반영" },
+      { id: "load", name: "Load", label: "사용자 입력·PDF 문서 로드", status: "done", detail: parsed.extractedChars ? `문서 텍스트 ${parsed.extractedChars}자 반영` : "사용자 직접입력 반영" },
       { id: "analyze_market", name: "Analyze", label: "공공데이터 시세 비교", status: "done", detail: `유사 거래 ${market.comparableCount}건, 신뢰도 ${market.marketConfidence}` },
       { id: "analyze_docs", name: "Analyze", label: "권리관계 위험 신호 추출", status: "done", detail: signals.length ? `${signals.length}개 신호` : "중대 신호 낮음" },
       { id: "score", name: "Graph", label: "위험 기준 적용·등급 산출", status: "done", detail: `${grade} / ${Math.round(score)}점` },
