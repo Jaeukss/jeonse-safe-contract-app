@@ -1,0 +1,29 @@
+{
+  "selected_at": "2026-05-21",
+  "training_scope": "서울 전체 1년치 실거래가",
+  "evaluation_scope": "관악구+강서구 holdout",
+  "selected_model": "hierarchical_median",
+  "selected_model_type": "machine_learning_statistical_baseline",
+  "reason": "관악구+강서구 평가에서 Ridge ML과 MLP 딥러닝보다 낮은 중앙 오차율을 기록했고, 설명 가능성이 높아 MVP 리포트에 적합함.",
+  "jeonse_deposit": {
+    "best_model": "hierarchical_median",
+    "mae_won": 43330097,
+    "rmse_won": 68427664,
+    "mape": 0.2216,
+    "median_ape": 0.0877,
+    "interpretation": "중앙 오차율은 MVP 참고 시세 기준으로 사용 가능하나 평균 MAPE가 20%를 넘어 일부 케이스 오차 경고 필요"
+  },
+  "sale_price": {
+    "best_model": "hierarchical_median",
+    "mae_won": 68399192,
+    "rmse_won": 136712407,
+    "mape": 0.1518,
+    "median_ape": 0.0667,
+    "interpretation": "MVP 참고 시세 기준으로 사용 가능"
+  },
+  "architecture_decision": {
+    "structured_data": "실거래가, 건축물대장, 주택가격은 머신러닝/통계 모델로 처리",
+    "unstructured_data": "계약서, 등기부등본, 중개대상물 확인설명서는 OCR + LLM/RAG로 처리",
+    "final_risk_decision": "가격 지표, 문서 신호, 체크박스, 규칙 기반 점수를 합산"
+  }
+}

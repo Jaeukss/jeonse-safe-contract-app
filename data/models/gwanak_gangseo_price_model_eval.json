@@ -1,0 +1,36 @@
+{
+  "task": "gwanak_gangseo_price_reference_model",
+  "threshold": {
+    "mape_warning": 0.2
+  },
+  "method": "hierarchical median estimator by district, dong, housing type, and area bucket",
+  "models": {
+    "jeonse_deposit": {
+      "train_rows": 16556,
+      "test_rows": 4167,
+      "target_col": "deposit",
+      "evaluation": {
+        "rows": 4167,
+        "mae_won": 42840064,
+        "rmse_won": 68651768,
+        "mape": 0.2044,
+        "median_ape": 0.0857
+      },
+      "warning": true
+    },
+    "sale_price": {
+      "train_rows": 11097,
+      "test_rows": 2845,
+      "target_col": "price",
+      "evaluation": {
+        "rows": 2845,
+        "mae_won": 68399192,
+        "rmse_won": 136712407,
+        "mape": 0.1518,
+        "median_ape": 0.0667
+      },
+      "warning": false
+    }
+  },
+  "warning_required": true
+}

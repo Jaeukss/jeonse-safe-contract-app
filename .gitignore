@@ -2,3 +2,11 @@ data/xlsx/~$*.xlsx
 huggingface-space-package.zip
 __pycache__/
 *.pyc
+
+# Generated local data/model artifacts. Regenerate with scripts/*.py.
+artifacts/*.zip
+data/processed/gwanak_gangseo_*.csv
+data/models/best_price_model_seoul_1y.json
+data/models/seoul_1y_ml_dl_benchmark.json
+data/models/gwanak_gangseo_price_model_tables.json
+data/rag_docs/processed/

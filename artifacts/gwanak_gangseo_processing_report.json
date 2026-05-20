@@ -1,0 +1,105 @@
+{
+  "project": "관악구+강서구 전세계약 위험진단 MVP",
+  "processed_at": "2026-05-20T23:09:12",
+  "raw_base": "C:\\Users\\User\\Desktop\\HWPX를_PDF로_1779283987915",
+  "scope": {
+    "districts": {
+      "관악구": "11620",
+      "강서구": "11500"
+    }
+  },
+  "trade_summary": {
+    "source_zip": "C:\\Users\\User\\Desktop\\HWPX를_PDF로_1779283987915\\(서울)(250517-260516)국토교통부_실거래가_정보_파일데이터.zip",
+    "source_files": 96,
+    "source_rows_scanned": 762465,
+    "rent_rows": 72561,
+    "sale_rows": 13942
+  },
+  "market_outputs": {
+    "rent_rows": 72561,
+    "sale_rows": 13942,
+    "combined_rows": 86503,
+    "files": {
+      "rent": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_rent_clean.csv",
+      "sale": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_sale_clean.csv",
+      "combined": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_market_transactions_clean.csv"
+    }
+  },
+  "building_outputs": {
+    "building_title": {
+      "rows": 57016,
+      "file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_building_title_clean.csv"
+    },
+    "building_exclusive": {
+      "rows": 408268,
+      "file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_building_exclusive_clean.csv"
+    },
+    "building_exclusive_area": {
+      "rows": 1881033,
+      "file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_building_exclusive_area_clean.csv"
+    },
+    "building_floor": {
+      "rows": 319095,
+      "file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_building_floor_clean.csv"
+    },
+    "building_recap_title": {
+      "rows": 1457,
+      "file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_building_recap_title_clean.csv"
+    }
+  },
+  "house_price_outputs": {
+    "source_rows_scanned": 2646893,
+    "history_rows": 2646893,
+    "latest_rows": 169474,
+    "latest_file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\processed\\gwanak_gangseo_official_house_price_latest.csv",
+    "latest_base_date_max": 20250101
+  },
+  "rag_outputs": {
+    "source_count": 11,
+    "processed_sources": 11,
+    "chunk_count": 213,
+    "corpus_file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\rag_docs\\processed\\rag_corpus_gwanak_gangseo.jsonl",
+    "manifest_file": "C:\\Users\\User\\Desktop\\codex-ppt-demo\\deploy-jeonse-safe-contract-app\\data\\rag_docs\\processed\\rag_source_manifest_gwanak_gangseo.json"
+  },
+  "model_evaluation": {
+    "task": "gwanak_gangseo_price_reference_model",
+    "threshold": {
+      "mape_warning": 0.2
+    },
+    "method": "hierarchical median estimator by district, dong, housing type, and area bucket",
+    "models": {
+      "jeonse_deposit": {
+        "train_rows": 16556,
+        "test_rows": 4167,
+        "target_col": "deposit",
+        "evaluation": {
+          "rows": 4167,
+          "mae_won": 42840064,
+          "rmse_won": 68651768,
+          "mape": 0.2044,
+          "median_ape": 0.0857
+        },
+        "warning": true
+      },
+      "sale_price": {
+        "train_rows": 11097,
+        "test_rows": 2845,
+        "target_col": "price",
+        "evaluation": {
+          "rows": 2845,
+          "mae_won": 68399192,
+          "rmse_won": 136712407,
+          "mape": 0.1518,
+          "median_ape": 0.0667
+        },
+        "warning": false
+      }
+    },
+    "warning_required": true
+  },
+  "notes": [
+    "최종 ZIP에는 원본 ZIP/PDF/DOC를 넣지 않고 전처리 산출물만 포함했습니다.",
+    "주택가격은 최신 기준일자 기준 건축물대장PK별 1행만 보조 피처로 사용합니다.",
+    "모델 성능 경고선은 MVP 회귀 기준 MAPE 20%로 설정했습니다."
+  ]
+}

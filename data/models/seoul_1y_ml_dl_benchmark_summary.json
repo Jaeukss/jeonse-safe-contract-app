@@ -1,0 +1,109 @@
+{
+  "task": "seoul_1y_ml_dl_price_model_benchmark",
+  "created_at": "2026-05-20T23:28:09",
+  "raw_base": "C:\\Users\\User\\Desktop\\HWPX를_PDF로_1779283987915",
+  "source_rows": 367073,
+  "training_scope": "서울 전체 1년치 실거래가",
+  "evaluation_scope": "관악구+강서구 holdout",
+  "warning_thresholds": {
+    "mape": 0.2,
+    "mdape": 0.1
+  },
+  "warning_required": true,
+  "benchmarks": [
+    {
+      "target_kind": "jeonse_deposit",
+      "train_rows_seoul": 180000,
+      "test_rows_target_scope": 4273,
+      "candidates": {
+        "hierarchical_median": {
+          "kind": "baseline_ml",
+          "evaluation": {
+            "rows": 4273,
+            "mae_won": 43330097,
+            "rmse_won": 68427664,
+            "mape": 0.2216,
+            "median_ape": 0.0877
+          }
+        },
+        "ridge_log_linear": {
+          "kind": "ml",
+          "evaluation": {
+            "rows": 4273,
+            "mae_won": 73420853,
+            "rmse_won": 109261102,
+            "mape": 0.333,
+            "median_ape": 0.1857
+          }
+        },
+        "mlp_log_price": {
+          "kind": "deep_learning",
+          "evaluation": {
+            "rows": 4273,
+            "mae_won": 78062880,
+            "rmse_won": 112759430,
+            "mape": 0.3397,
+            "median_ape": 0.1963
+          }
+        }
+      },
+      "best_model": "hierarchical_median",
+      "best_kind": "baseline_ml",
+      "best_evaluation": {
+        "rows": 4273,
+        "mae_won": 43330097,
+        "rmse_won": 68427664,
+        "mape": 0.2216,
+        "median_ape": 0.0877
+      },
+      "warning": true
+    },
+    {
+      "target_kind": "sale_price",
+      "train_rows_seoul": 108395,
+      "test_rows_target_scope": 2845,
+      "candidates": {
+        "hierarchical_median": {
+          "kind": "baseline_ml",
+          "evaluation": {
+            "rows": 2845,
+            "mae_won": 68399192,
+            "rmse_won": 136712407,
+            "mape": 0.1518,
+            "median_ape": 0.0667
+          }
+        },
+        "ridge_log_linear": {
+          "kind": "ml",
+          "evaluation": {
+            "rows": 2845,
+            "mae_won": 193425040,
+            "rmse_won": 434469822,
+            "mape": 0.3956,
+            "median_ape": 0.2629
+          }
+        },
+        "mlp_log_price": {
+          "kind": "deep_learning",
+          "evaluation": {
+            "rows": 2845,
+            "mae_won": 191756965,
+            "rmse_won": 304534609,
+            "mape": 0.3934,
+            "median_ape": 0.2706
+          }
+        }
+      },
+      "best_model": "hierarchical_median",
+      "best_kind": "baseline_ml",
+      "best_evaluation": {
+        "rows": 2845,
+        "mae_won": 68399192,
+        "rmse_won": 136712407,
+        "mape": 0.1518,
+        "median_ape": 0.0667
+      },
+      "warning": false
+    }
+  ]
+}
