@@ -12,3 +12,4 @@ data/models/best_price_model_seoul_multi_year.json
 data/models/seoul_multi_year_ml_dl_benchmark.json
 data/models/gwanak_gangseo_price_model_tables.json
 data/rag_docs/processed/
+data/model_diagnostics/*.csv

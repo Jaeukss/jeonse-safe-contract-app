@@ -16,6 +16,7 @@ EXPLICIT_FILES = [
     "data/models/selected_price_model_summary.json",
     "data/models/seoul_multi_year_ml_dl_benchmark_summary.json",
     "docs/MODELING_AND_DATA_REPORT.md",
+    "docs/MODEL_ERROR_ANALYSIS.md",
     "docs/01_mvp_scope.md",
     "docs/business_plan_workflow.md",
     "docs/DATA_ACQUISITION_STATUS.md",
@@ -23,8 +24,10 @@ EXPLICIT_FILES = [
     "docs/demo_script.md",
     "docs/final_architecture.md",
     "docs/OFFICIAL_RAG_SOURCE_LINKS.md",
+    "docs/VS_CODE_EVALUATION_GUIDE.md",
     "scripts/build_gwanak_gangseo_assets.py",
     "scripts/benchmark_price_models.py",
+    "scripts/evaluate_price_model_errors.py",
     "scripts/package_final_assets.py",
 ]
 
@@ -34,6 +37,7 @@ GLOBS = [
     "data/processed/ganak_sale_clean.csv",
     "data/processed/ganak_building_clean.csv",
     "data/rag_docs/processed/*",
+    "data/model_diagnostics/*",
 ]
 
 

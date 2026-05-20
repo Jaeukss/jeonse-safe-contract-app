@@ -1,0 +1,41 @@
+{
+  "created_at": "2026-05-21T03:11:27",
+  "model_path": "data\\models\\best_price_model_seoul_multi_year.json",
+  "eval_data_path": "data\\processed\\gwanak_gangseo_market_eval_scope_from_seoul_multi_year.csv",
+  "targets": [
+    {
+      "target_kind": "jeonse_deposit",
+      "rows": 8703,
+      "mae_won": 44278896,
+      "rmse_won": 71759288,
+      "mape_percent": 23.17,
+      "mdape_percent": 9.09,
+      "top_error_rate_10pct_threshold": 46.67
+    },
+    {
+      "target_kind": "sale_price",
+      "rows": 4821,
+      "mae_won": 64462850,
+      "rmse_won": 145187818,
+      "mape_percent": 13.96,
+      "mdape_percent": 6.34,
+      "top_error_rate_10pct_threshold": 32.84
+    }
+  ],
+  "output_files": [
+    "data\\model_diagnostics\\predictions_jeonse_deposit.csv",
+    "data\\model_diagnostics\\top_error_rate_10pct_jeonse_deposit.csv",
+    "data\\model_diagnostics\\top_absolute_error_10pct_jeonse_deposit.csv",
+    "data\\model_diagnostics\\top_error_rate_20pct_jeonse_deposit.csv",
+    "data\\model_diagnostics\\top_absolute_error_20pct_jeonse_deposit.csv",
+    "data\\model_diagnostics\\segment_performance_jeonse_deposit.csv",
+    "data\\model_diagnostics\\predictions_sale_price.csv",
+    "data\\model_diagnostics\\top_error_rate_10pct_sale_price.csv",
+    "data\\model_diagnostics\\top_absolute_error_10pct_sale_price.csv",
+    "data\\model_diagnostics\\top_error_rate_20pct_sale_price.csv",
+    "data\\model_diagnostics\\top_absolute_error_20pct_sale_price.csv",
+    "data\\model_diagnostics\\segment_performance_sale_price.csv",
+    "data\\model_diagnostics\\error_analysis_summary.json",
+    "docs\\MODEL_ERROR_ANALYSIS.md"
+  ]
+}
