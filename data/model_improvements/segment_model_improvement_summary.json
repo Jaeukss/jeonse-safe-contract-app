@@ -1,0 +1,138 @@
+{
+  "created_at": "2026-05-21T03:32:21",
+  "base_model_path": "data\\models\\best_price_model_seoul_multi_year.json",
+  "eval_data_path": "data\\processed\\gwanak_gangseo_market_eval_scope_from_seoul_multi_year.csv",
+  "summary_path": "data\\model_improvements\\segment_model_improvement_summary.json",
+  "selected_model_path": "data\\models\\segmented_price_model_summary.json",
+  "targets": [
+    {
+      "target_kind": "jeonse_deposit",
+      "train_rows": 34723,
+      "test_rows": 8703,
+      "candidate_evaluations": {
+        "baseline_seoul_hierarchical_median": {
+          "rows": 8703,
+          "mae_won": 44278896,
+          "rmse_won": 71759288,
+          "mape_percent": 23.17,
+          "mdape_percent": 9.09
+        },
+        "target_scope_segment_median": {
+          "rows": 8703,
+          "mae_won": 46292527,
+          "rmse_won": 73337055,
+          "mape_percent": 24.23,
+          "mdape_percent": 10.0
+        },
+        "segment_ratio_calibrated_baseline": {
+          "rows": 8703,
+          "mae_won": 44206259,
+          "rmse_won": 71357277,
+          "mape_percent": 23.14,
+          "mdape_percent": 9.09
+        },
+        "segment_residual_calibrated_baseline": {
+          "rows": 8703,
+          "mae_won": 44205317,
+          "rmse_won": 71379371,
+          "mape_percent": 23.14,
+          "mdape_percent": 9.09
+        },
+        "routed_local_or_ratio": {
+          "rows": 8703,
+          "mae_won": 46292527,
+          "rmse_won": 73337055,
+          "mape_percent": 24.23,
+          "mdape_percent": 10.0
+        }
+      },
+      "selected_model": "segment_residual_calibrated_baseline",
+      "selected_evaluation": {
+        "rows": 8703,
+        "mae_won": 44205317,
+        "rmse_won": 71379371,
+        "mape_percent": 23.14,
+        "mdape_percent": 9.09
+      },
+      "baseline_evaluation": {
+        "rows": 8703,
+        "mae_won": 44278896,
+        "rmse_won": 71759288,
+        "mape_percent": 23.17,
+        "mdape_percent": 9.09
+      },
+      "improvement_vs_baseline": {
+        "mae_won": 73579,
+        "rmse_won": 379917,
+        "mape_percent": 0.03,
+        "mdape_percent": 0.0
+      },
+      "prediction_file": "data\\model_improvements\\segment_improvement_predictions_jeonse_deposit.csv"
+    },
+    {
+      "target_kind": "sale_price",
+      "train_rows": 18802,
+      "test_rows": 4821,
+      "candidate_evaluations": {
+        "baseline_seoul_hierarchical_median": {
+          "rows": 4821,
+          "mae_won": 64462850,
+          "rmse_won": 145187818,
+          "mape_percent": 13.96,
+          "mdape_percent": 6.34
+        },
+        "target_scope_segment_median": {
+          "rows": 4821,
+          "mae_won": 79569955,
+          "rmse_won": 162774581,
+          "mape_percent": 17.3,
+          "mdape_percent": 8.21
+        },
+        "segment_ratio_calibrated_baseline": {
+          "rows": 4821,
+          "mae_won": 64464089,
+          "rmse_won": 145190001,
+          "mape_percent": 13.96,
+          "mdape_percent": 6.34
+        },
+        "segment_residual_calibrated_baseline": {
+          "rows": 4821,
+          "mae_won": 64464250,
+          "rmse_won": 145188070,
+          "mape_percent": 13.96,
+          "mdape_percent": 6.34
+        },
+        "routed_local_or_ratio": {
+          "rows": 4821,
+          "mae_won": 79569955,
+          "rmse_won": 162774581,
+          "mape_percent": 17.3,
+          "mdape_percent": 8.21
+        }
+      },
+      "selected_model": "baseline_seoul_hierarchical_median",
+      "selected_evaluation": {
+        "rows": 4821,
+        "mae_won": 64462850,
+        "rmse_won": 145187818,
+        "mape_percent": 13.96,
+        "mdape_percent": 6.34
+      },
+      "baseline_evaluation": {
+        "rows": 4821,
+        "mae_won": 64462850,
+        "rmse_won": 145187818,
+        "mape_percent": 13.96,
+        "mdape_percent": 6.34
+      },
+      "improvement_vs_baseline": {
+        "mae_won": 0,
+        "rmse_won": 0,
+        "mape_percent": 0.0,
+        "mdape_percent": 0.0
+      },
+      "prediction_file": "data\\model_improvements\\segment_improvement_predictions_sale_price.csv"
+    }
+  ],
+  "report_path": "docs\\SEGMENT_MODEL_IMPROVEMENT_REPORT.md"
+}

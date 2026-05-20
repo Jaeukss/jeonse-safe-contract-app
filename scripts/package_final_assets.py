@@ -14,9 +14,11 @@ EXPLICIT_FILES = [
     "data/models/best_price_model_seoul_multi_year.json",
     "data/models/gwanak_gangseo_price_model_eval.json",
     "data/models/selected_price_model_summary.json",
+    "data/models/segmented_price_model_summary.json",
     "data/models/seoul_multi_year_ml_dl_benchmark_summary.json",
     "docs/MODELING_AND_DATA_REPORT.md",
     "docs/MODEL_ERROR_ANALYSIS.md",
+    "docs/SEGMENT_MODEL_IMPROVEMENT_REPORT.md",
     "docs/01_mvp_scope.md",
     "docs/business_plan_workflow.md",
     "docs/DATA_ACQUISITION_STATUS.md",
@@ -28,6 +30,7 @@ EXPLICIT_FILES = [
     "scripts/build_gwanak_gangseo_assets.py",
     "scripts/benchmark_price_models.py",
     "scripts/evaluate_price_model_errors.py",
+    "scripts/segment_price_model_improvement.py",
     "scripts/package_final_assets.py",
 ]
 
@@ -38,6 +41,7 @@ GLOBS = [
     "data/processed/ganak_building_clean.csv",
     "data/rag_docs/processed/*",
     "data/model_diagnostics/*",
+    "data/model_improvements/*",
 ]
 
 

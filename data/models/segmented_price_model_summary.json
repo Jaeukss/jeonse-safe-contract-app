@@ -1,0 +1,124 @@
+{
+  "jeonse_deposit": {
+    "selected_model": "segment_residual_calibrated_baseline",
+    "selected_evaluation": {
+      "rows": 8703,
+      "mae_won": 44205317,
+      "rmse_won": 71379371,
+      "mape_percent": 23.14,
+      "mdape_percent": 9.09
+    },
+    "baseline_evaluation": {
+      "rows": 8703,
+      "mae_won": 44278896,
+      "rmse_won": 71759288,
+      "mape_percent": 23.17,
+      "mdape_percent": 9.09
+    },
+    "improvement_vs_baseline": {
+      "mae_won": 73579,
+      "rmse_won": 379917,
+      "mape_percent": 0.03,
+      "mdape_percent": 0.0
+    },
+    "candidate_evaluations": {
+      "baseline_seoul_hierarchical_median": {
+        "rows": 8703,
+        "mae_won": 44278896,
+        "rmse_won": 71759288,
+        "mape_percent": 23.17,
+        "mdape_percent": 9.09
+      },
+      "target_scope_segment_median": {
+        "rows": 8703,
+        "mae_won": 46292527,
+        "rmse_won": 73337055,
+        "mape_percent": 24.23,
+        "mdape_percent": 10.0
+      },
+      "segment_ratio_calibrated_baseline": {
+        "rows": 8703,
+        "mae_won": 44206259,
+        "rmse_won": 71357277,
+        "mape_percent": 23.14,
+        "mdape_percent": 9.09
+      },
+      "segment_residual_calibrated_baseline": {
+        "rows": 8703,
+        "mae_won": 44205317,
+        "rmse_won": 71379371,
+        "mape_percent": 23.14,
+        "mdape_percent": 9.09
+      },
+      "routed_local_or_ratio": {
+        "rows": 8703,
+        "mae_won": 46292527,
+        "rmse_won": 73337055,
+        "mape_percent": 24.23,
+        "mdape_percent": 10.0
+      }
+    },
+    "note": "Detailed segment tables are reproducible by rerunning scripts/segment_price_model_improvement.py."
+  },
+  "sale_price": {
+    "selected_model": "baseline_seoul_hierarchical_median",
+    "selected_evaluation": {
+      "rows": 4821,
+      "mae_won": 64462850,
+      "rmse_won": 145187818,
+      "mape_percent": 13.96,
+      "mdape_percent": 6.34
+    },
+    "baseline_evaluation": {
+      "rows": 4821,
+      "mae_won": 64462850,
+      "rmse_won": 145187818,
+      "mape_percent": 13.96,
+      "mdape_percent": 6.34
+    },
+    "improvement_vs_baseline": {
+      "mae_won": 0,
+      "rmse_won": 0,
+      "mape_percent": 0.0,
+      "mdape_percent": 0.0
+    },
+    "candidate_evaluations": {
+      "baseline_seoul_hierarchical_median": {
+        "rows": 4821,
+        "mae_won": 64462850,
+        "rmse_won": 145187818,
+        "mape_percent": 13.96,
+        "mdape_percent": 6.34
+      },
+      "target_scope_segment_median": {
+        "rows": 4821,
+        "mae_won": 79569955,
+        "rmse_won": 162774581,
+        "mape_percent": 17.3,
+        "mdape_percent": 8.21
+      },
+      "segment_ratio_calibrated_baseline": {
+        "rows": 4821,
+        "mae_won": 64464089,
+        "rmse_won": 145190001,
+        "mape_percent": 13.96,
+        "mdape_percent": 6.34
+      },
+      "segment_residual_calibrated_baseline": {
+        "rows": 4821,
+        "mae_won": 64464250,
+        "rmse_won": 145188070,
+        "mape_percent": 13.96,
+        "mdape_percent": 6.34
+      },
+      "routed_local_or_ratio": {
+        "rows": 4821,
+        "mae_won": 79569955,
+        "rmse_won": 162774581,
+        "mape_percent": 17.3,
+        "mdape_percent": 8.21
+      }
+    },
+    "note": "Detailed segment tables are reproducible by rerunning scripts/segment_price_model_improvement.py."
+  }
+}
