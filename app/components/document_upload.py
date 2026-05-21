@@ -64,7 +64,7 @@ def _render_prefill_controls(st: Any, prefill: dict[str, Any]) -> None:
 
     digest = hashlib.sha256(json.dumps(prefill, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")).hexdigest()
     if st.session_state.get("auto_prefill_digest") != digest:
-        changed = apply_basic_defaults(st, prefill, overwrite_defaults=True)
+        changed = apply_basic_defaults(st, prefill, overwrite=True)
         st.session_state["auto_prefill_digest"] = digest
         if changed:
             st.success("문서에서 추출한 기본정보를 자동 반영했습니다. 값이 다르면 기본정보에서 직접 수정하세요.")
