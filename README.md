@@ -31,6 +31,25 @@ streamlit run app.py
 
 Python이 PATH에 없다면 로컬 Python 또는 Codex 번들 Python 경로로 실행하세요.
 
+## OpenRouter 설정
+
+LLM 기반 문서 JSON 보정은 OpenRouter API key가 있을 때만 활성화됩니다. 배포자가 설정해야 하는 값은 `OPENROUTER_API_KEY` 하나입니다.
+
+Streamlit Cloud 또는 `.streamlit/secrets.toml`:
+
+```toml
+OPENROUTER_API_KEY = "sk-or-..."
+```
+
+로컬 환경변수:
+
+```powershell
+$env:OPENROUTER_API_KEY="sk-or-..."
+streamlit run app.py
+```
+
+기본 호출 모델은 `deepseek/deepseek-v4-flash:free`이며, 실패하면 `nvidia/nemotron-3-super-120b-a12b:free`로 자동 재시도합니다. API key가 없으면 기존 규칙 기반 OCR/텍스트 추출과 사용자 보완 입력 흐름만 사용합니다. 임베딩 또는 벡터DB 검색 키가 별도로 필요한 구조를 추가할 경우에는 이 키와 분리해서 관리해야 합니다.
+
 ## 데이터 적용 방식
 
 앱은 시작할 때 `src/data_bootstrap.py`로 전처리 데이터 상태를 확인합니다.

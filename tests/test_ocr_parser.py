@@ -78,7 +78,7 @@ def test_pii_masking_blocks_resident_number():
 
 
 def test_extract_fields_runs_without_llm_api_key(monkeypatch):
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     result = extract_fields("explanation", "주소: 서울 강서구 화곡동 1-1\n보증금: 1억\n월차임: 20만원")
 
     assert result["address"] == "서울 강서구 화곡동 1-1"

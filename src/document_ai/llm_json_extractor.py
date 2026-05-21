@@ -1,7 +1,10 @@
 from __future__ import annotations
 
-import os
+import json
+import re
 from typing import Any
+
+from src.llm.openrouter_client import call_openrouter_with_fallback, has_openrouter_api_key
 
 from .document_classifier import DocumentType
 
@@ -34,23 +37,56 @@ BASIC_INFO_SCHEMA_KEYS = (
 
 
 def extract_with_llm_if_configured(document_type: DocumentType, text: str) -> dict[str, Any]:
-    """Future extension point for API-key based structured JSON extraction.
+    """Extract missing document fields with OpenRouter if a key is configured.
 
-    The MVP must run without an API key, so this function intentionally returns
-    an empty result unless the user later enables an LLM extraction path.
+    The MVP still runs without an API key. If OPENROUTER_API_KEY is absent,
+    the regex/OCR pipeline remains the only extraction path.
     """
 
     if not text.strip():
         return {}
-    if not os.getenv("OPENAI_API_KEY"):
-        return {}
-    if os.getenv("JEONSE_ENABLE_LLM_EXTRACTION") != "1":
+    if not has_openrouter_api_key():
         return {}
 
-    # Keep the current MVP deterministic and free of mandatory network calls.
-    # When high-accuracy extraction is enabled later, this function should call
-    # a structured-output model and return only keys in BASIC_INFO_SCHEMA_KEYS.
-    return {"llm_extraction_status": f"configured_but_not_implemented_for_{document_type}"}
+    schema_keys = ", ".join(BASIC_INFO_SCHEMA_KEYS)
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You extract Korean real-estate contract and registry fields. "
+                "Return JSON only. Do not guess. If a value is not visible, use null. "
+                "Use only these keys: " + schema_keys
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"document_type={document_type}\n"
+                "Extract fields from this OCR/manual text. "
+                "Money values must be KRW integers, area_m2 must be a number, "
+                "booleans must be true/false/null.\n\n"
+                f"{text[:12000]}"
+            ),
+        },
+    ]
+    content = call_openrouter_with_fallback(messages, temperature=0.0, max_tokens=1200)
+    if not content:
+        return {}
+    return _parse_llm_json(content)
+
+
+def _parse_llm_json(content: str) -> dict[str, Any]:
+    cleaned = content.strip()
+    fenced = re.search(r"```(?:json)?\s*(.*?)```", cleaned, re.S | re.I)
+    if fenced:
+        cleaned = fenced.group(1).strip()
+    try:
+        parsed = json.loads(cleaned)
+    except json.JSONDecodeError:
+        return {}
+    if not isinstance(parsed, dict):
+        return {}
+    return {key: value for key, value in parsed.items() if key in BASIC_INFO_SCHEMA_KEYS}
 
 
 def merge_llm_fields(fields: dict[str, object], llm_fields: dict[str, Any]) -> dict[str, object]:
