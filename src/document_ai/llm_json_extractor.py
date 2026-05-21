@@ -17,8 +17,11 @@ BASIC_INFO_SCHEMA_KEYS = (
     "monthly_rent",
     "area_m2",
     "floor",
+    "room",
+    "unit_dong",
     "built_year",
     "approval_year",
+    "contract_type",
     "registry_checked",
     "mortgage_flag",
     "mortgage_amount",
@@ -33,6 +36,9 @@ BASIC_INFO_SCHEMA_KEYS = (
     "broker_explanation_checked",
     "rights_explained",
     "broker_signed",
+    "extraction_outlier_flag",
+    "extraction_outlier_reasons",
+    "manual_review_required",
 )
 
 
@@ -53,18 +59,29 @@ def extract_with_llm_if_configured(document_type: DocumentType, text: str) -> di
         {
             "role": "system",
             "content": (
-                "You extract Korean real-estate contract and registry fields. "
-                "Return JSON only. Do not guess. If a value is not visible, use null. "
-                "Use only these keys: " + schema_keys
+                "You are a Korean real-estate contract and registry parsing verifier. "
+                "Return a single JSON object only, with no markdown fence and no explanation. "
+                "Do not guess. Use null for invisible or uncertain values. "
+                "Use a flat object with only these keys: "
+                + schema_keys
+                + ". Treat extracted values as candidates, not facts. If floor is greater than 80 "
+                "or below -5, omit floor and set extraction_outlier_flag=true with a reason. "
+                "If an address is fragmented, normalize it only when Seoul plus Gwanak-gu or Gangseo-gu "
+                "and a dong/road/building clue are visible. If money text is visible but deposit cannot "
+                "be converted to KRW integer, set extraction_outlier_flag=true. "
+                "For Korean money words, convert 금이억오천만원정 to 250000000 and 천오백만 to 15000000. "
+                "For 1억 2,000 in a deposit context, treat 2,000 as 만원. "
+                "Do not infer contract_type unless deposit/monthly_rent evidence is visible."
             ),
         },
         {
             "role": "user",
             "content": (
                 f"document_type={document_type}\n"
-                "Extract fields from this OCR/manual text. "
+                "Verify and normalize fields from this OCR/manual text. "
                 "Money values must be KRW integers, area_m2 must be a number, "
-                "booleans must be true/false/null.\n\n"
+                "booleans must be true/false/null, extraction_outlier_reasons must be an array of strings. "
+                "Never return impossible floor values such as 850 or -6 as floor; route them to outlier reasons.\n\n"
                 f"{text[:12000]}"
             ),
         },
@@ -86,13 +103,59 @@ def _parse_llm_json(content: str) -> dict[str, Any]:
         return {}
     if not isinstance(parsed, dict):
         return {}
-    return {key: value for key, value in parsed.items() if key in BASIC_INFO_SCHEMA_KEYS}
+    flattened = _flatten_llm_json(parsed)
+    return {key: value for key, value in flattened.items() if key in BASIC_INFO_SCHEMA_KEYS}
+
+
+def _flatten_llm_json(parsed: dict[str, Any]) -> dict[str, Any]:
+    flattened = dict(parsed)
+    address = parsed.get("address")
+    if isinstance(address, dict):
+        parts = [
+            address.get("city"),
+            address.get("borough"),
+            address.get("dong") or address.get("road_name"),
+            address.get("building_name"),
+        ]
+        joined = " ".join(str(part).strip() for part in parts if part)
+        if joined:
+            flattened["address"] = joined
+        for source_key, target_key in (("floor", "floor"), ("room", "room"), ("unit_dong", "unit_dong")):
+            if source_key in address:
+                flattened[target_key] = address.get(source_key)
+
+    contract = parsed.get("contract")
+    if isinstance(contract, dict):
+        for key in ("deposit", "monthly_rent", "contract_type"):
+            if key in contract:
+                flattened[key] = contract.get(key)
+
+    validation = parsed.get("validation_status")
+    if isinstance(validation, dict):
+        if "is_outlier" in validation:
+            flattened["extraction_outlier_flag"] = bool(validation.get("is_outlier"))
+            flattened["manual_review_required"] = bool(validation.get("is_outlier"))
+        reason = validation.get("outlier_reason")
+        reasons = validation.get("outlier_reasons")
+        if reasons:
+            flattened["extraction_outlier_reasons"] = reasons if isinstance(reasons, list) else [str(reasons)]
+        elif reason:
+            flattened["extraction_outlier_reasons"] = [str(reason)]
+    return flattened
 
 
 def merge_llm_fields(fields: dict[str, object], llm_fields: dict[str, Any]) -> dict[str, object]:
     for key, value in llm_fields.items():
-        if key not in BASIC_INFO_SCHEMA_KEYS or value in (None, "", 0):
+        if key not in BASIC_INFO_SCHEMA_KEYS or value in (None, ""):
             continue
+        if isinstance(value, (int, float)) and not isinstance(value, bool) and value == 0:
+            continue
+        if key == "floor":
+            try:
+                if not -5 <= int(value) <= 80:
+                    continue
+            except (TypeError, ValueError):
+                continue
         if fields.get(key) in (None, "", 0):
             fields[key] = value
     return fields

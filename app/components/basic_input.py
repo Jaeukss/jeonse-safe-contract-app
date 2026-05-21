@@ -32,9 +32,15 @@ DEFAULT_BASIC_VALUES = {
 
 def _coerce_value(field: str, value: Any) -> Any:
     if field in {"deposit", "monthly_rent", "floor", "built_year"}:
-        return int(float(value))
+        coerced = int(float(value))
+        if field == "floor" and not -5 <= coerced <= 80:
+            raise ValueError("floor out of range")
+        return coerced
     if field == "area_m2":
-        return float(value)
+        coerced = float(value)
+        if coerced <= 0 or coerced > 500:
+            raise ValueError("area_m2 out of range")
+        return coerced
     if field == "housing_type" and value not in HOUSING_TYPES:
         return DEFAULT_BASIC_VALUES[field]
     if field == "contract_stage" and value not in CONTRACT_STAGES:
@@ -47,7 +53,10 @@ def apply_basic_defaults(st: Any, defaults: dict[str, Any], *, overwrite: bool =
     for field, key in BASIC_FIELD_KEYS.items():
         if field not in defaults or defaults[field] in (None, ""):
             continue
-        value = _coerce_value(field, defaults[field])
+        try:
+            value = _coerce_value(field, defaults[field])
+        except (TypeError, ValueError):
+            continue
         current = st.session_state.get(key)
         should_apply = key not in st.session_state or overwrite
         if overwrite_defaults and current == DEFAULT_BASIC_VALUES.get(field):

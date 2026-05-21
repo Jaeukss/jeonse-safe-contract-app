@@ -1,5 +1,6 @@
 from src.document_ai.basic_info_parser import extract_basic_info
 from src.document_ai.extract_fields import extract_fields
+from src.document_ai.llm_json_extractor import _parse_llm_json
 from src.document_ai.pii_masking import has_unmasked_pii, mask_pii
 from src.document_ai.registry_parser import parse_money, parse_registry_text
 
@@ -8,6 +9,10 @@ def test_parse_money_handles_korean_units_without_double_counting():
     assert parse_money("2억 4천만원") == 240_000_000
     assert parse_money("7천만원") == 70_000_000
     assert parse_money("246000000원") == 246_000_000
+    assert parse_money("금이억오천만원정") == 250_000_000
+    assert parse_money("천오백만") == 15_000_000
+    assert parse_money("₩250,000,000") == 250_000_000
+    assert parse_money("1억 2,000") == 120_000_000
 
 
 def test_registry_parser_extracts_core_flags():
@@ -67,6 +72,64 @@ def test_basic_info_parser_extracts_all_basic_input_fields_from_common_labels():
     assert result["area_m2"] == 33.5
     assert result["floor"] == 2
     assert result["built_year"] == 2010
+
+
+def test_basic_info_parser_restores_fragmented_address_and_hangul_money():
+    result = extract_basic_info(
+        "부동산의 표시\n"
+        "서울특별\n"
+        "시 관악\n"
+        "구 봉천\n"
+        "동 123-4 해든빌라 501호\n"
+        "보증금 금이억오천만원정\n"
+        "월세 없음\n"
+    )
+
+    assert result["address"].startswith("서울특별시 관악구 봉천동 123-4")
+    assert result["room"] == "501호"
+    assert result["deposit"] == 250_000_000
+    assert result["contract_type"] == "전세"
+
+
+def test_basic_info_parser_flags_impossible_floor_without_prefill():
+    result = extract_basic_info("서울 강서구 화곡동 1027-8 8층 501호 OCR 오류 850층 보증금 2억")
+
+    assert "floor" not in result
+    assert result["extraction_outlier_flag"] is True
+    assert result["manual_review_required"] is True
+    assert any("조건 A" in reason for reason in result["extraction_outlier_reasons"])
+
+
+def test_llm_json_parser_accepts_nested_validation_schema():
+    result = _parse_llm_json(
+        """
+        {
+          "address": {
+            "city": "서울특별시",
+            "borough": "강서구",
+            "dong": "화곡동",
+            "building_name": "해든빌라",
+            "floor": 850,
+            "room": "501호"
+          },
+          "contract": {
+            "deposit": 270000000,
+            "monthly_rent": 0,
+            "contract_type": "전세"
+          },
+          "validation_status": {
+            "is_outlier": true,
+            "outlier_reason": "조건 A: 층수 오류"
+          }
+        }
+        """
+    )
+
+    assert result["address"] == "서울특별시 강서구 화곡동 해든빌라"
+    assert result["deposit"] == 270_000_000
+    assert result["room"] == "501호"
+    assert result["extraction_outlier_flag"] is True
+    assert result["extraction_outlier_reasons"] == ["조건 A: 층수 오류"]
 
 
 def test_pii_masking_blocks_resident_number():

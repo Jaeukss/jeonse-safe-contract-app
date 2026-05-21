@@ -3,8 +3,58 @@ from __future__ import annotations
 import re
 
 
+HANGUL_DIGITS = {
+    "영": 0,
+    "공": 0,
+    "일": 1,
+    "이": 2,
+    "삼": 3,
+    "사": 4,
+    "오": 5,
+    "육": 6,
+    "칠": 7,
+    "팔": 8,
+    "구": 9,
+}
+
+HANGUL_SMALL_UNITS = {"십": 10, "백": 100, "천": 1000}
+
+
+def _parse_hangul_under_10000(text: str) -> int:
+    total = 0
+    current = 0
+    for char in text:
+        if char in HANGUL_DIGITS:
+            current = HANGUL_DIGITS[char]
+        elif char in HANGUL_SMALL_UNITS:
+            total += (current or 1) * HANGUL_SMALL_UNITS[char]
+            current = 0
+    return total + current
+
+
+def _parse_hangul_money(compact: str) -> int:
+    if not any(char in compact for char in set(HANGUL_DIGITS) | set(HANGUL_SMALL_UNITS) | {"억", "만"}):
+        return 0
+
+    total = 0
+    rest = compact
+    if "억" in rest:
+        before, rest = rest.split("억", 1)
+        total += (_parse_hangul_under_10000(before) or 1) * 100_000_000
+    if "만" in rest:
+        before, _after = rest.split("만", 1)
+        total += (_parse_hangul_under_10000(before) or 1) * 10_000
+    return total
+
+
 def parse_money(text: str) -> int:
-    compact = re.sub(r"[\s,]", "", text or "").replace("원", "")
+    compact = re.sub(r"[\s,₩￦]", "", text or "")
+    compact = compact.replace("원", "").replace("금", "").replace("정", "")
+
+    pure_digits = re.fullmatch(r"\d{6,}", compact)
+    if pure_digits:
+        return int(compact)
+
     total = 0.0
     eok = re.search(r"(\d+(?:\.\d+)?)억", compact)
     if eok:
@@ -22,10 +72,21 @@ def parse_money(text: str) -> int:
         (r"(\d+(?:\.\d+)?)천", 10_000_000),
     )
     for pattern, unit in unit_patterns:
-        match = re.search(pattern, compact)
-        if match:
+        while True:
+            match = re.search(pattern, compact)
+            if not match:
+                break
             total += float(match.group(1)) * unit
-            break
+            compact = compact[: match.start()] + compact[match.end() :]
+
+    if total and re.fullmatch(r"\d{1,4}", compact):
+        # Shorthand such as "1억 2,000" usually means 2,000만원 in contracts.
+        total += float(compact) * 10_000
+
+    if not total:
+        hangul_amount = _parse_hangul_money(compact)
+        if hangul_amount:
+            total = float(hangul_amount)
 
     if not total:
         digits = re.search(r"\d{7,}", compact)

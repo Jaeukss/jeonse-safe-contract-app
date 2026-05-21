@@ -77,6 +77,18 @@ def _format_ocr_error(error: Any) -> str:
     return f"OCR 처리 중 문제가 발생했습니다. 원인: {message}"
 
 
+def _format_outlier_warning(record: dict[str, Any]) -> str:
+    data = record.get("data", {})
+    if not data.get("extraction_outlier_flag"):
+        return ""
+    reasons = data.get("extraction_outlier_reasons") or []
+    if isinstance(reasons, str):
+        reasons = [reasons]
+    if not reasons:
+        return "문서 추출값에 이상값이 감지되어 기본정보에서 직접 확인해야 합니다."
+    return " / ".join(str(reason) for reason in reasons)
+
+
 def _render_ocr_review(st: Any, session_id: str, result: dict[str, Any], filename: str) -> dict[str, Any]:
     cache_key = str(result["_cache_key"])
     reviewed = st.session_state.setdefault("reviewed_document_results", {})
@@ -141,6 +153,12 @@ def render_document_upload(st: Any, session_id: str) -> list[dict[str, Any]]:
                 )
             if active_result["pii_blocked"]:
                 st.warning(f"{file.name}에서 개인정보 마스킹 잔여 가능성이 있어 RAG/LLM 경로를 차단했습니다.")
+            outlier_warning = _format_outlier_warning(active_result["record"])
+            if outlier_warning:
+                st.warning(
+                    f"{file.name} 추출값 확인 필요: {outlier_warning} "
+                    "자동 반영값을 그대로 믿지 말고 기본정보 입력란에서 직접 수정하세요."
+                )
 
     pasted_text = st.text_area("문서 텍스트 직접 붙여넣기", height=110, placeholder="OCR이 잘 안 되면 등기부등본/건축물대장/확인설명서에서 보이는 내용을 붙여넣으세요.")
     if st.button("붙여넣은 문서 분석", use_container_width=True, disabled=not pasted_text.strip()):
