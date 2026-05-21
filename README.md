@@ -25,10 +25,26 @@ OCR 텍스트를 먼저 추출하고, 추출 실패 또는 불확실 항목은 �
 
 ```powershell
 pip install -r requirements.txt
+python scripts/bootstrap_data.py
 streamlit run app.py
 ```
 
 Python이 PATH에 없다면 로컬 Python 또는 Codex 번들 Python 경로로 실행하세요.
+
+## 데이터 적용 방식
+
+앱은 시작할 때 `src/data_bootstrap.py`로 전처리 데이터 상태를 확인합니다.
+
+- 로컬에 `artifacts/gwanak_gangseo_final_used_files.zip`이 있으면 필요한 CSV/RAG/모델 산출물을 자동으로 풉니다.
+- 배포 환경에서는 `JEONSE_DATA_ZIP_URL` 환경변수에 zip 다운로드 URL을 넣으면 앱이 시작 시 내려받아 풉니다.
+- 자동 준비를 끄고 싶으면 `JEONSE_AUTO_BOOTSTRAP=0`을 설정합니다.
+
+VSCode에서 전체 데이터가 적용됐는지 먼저 확인하려면 아래만 실행해도 됩니다.
+
+```powershell
+python scripts/bootstrap_data.py
+python scripts/run_mvp_smoke.py
+```
 
 ## 데이터 전처리
 

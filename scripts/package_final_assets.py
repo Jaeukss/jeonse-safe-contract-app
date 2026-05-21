@@ -37,12 +37,15 @@ EXPLICIT_FILES = [
     "docs/VS_CODE_EVALUATION_GUIDE.md",
     "scripts/build_gwanak_gangseo_assets.py",
     "scripts/benchmark_price_models.py",
+    "scripts/bootstrap_data.py",
     "scripts/evaluate_price_model_errors.py",
     "scripts/segment_price_model_improvement.py",
     "scripts/package_final_assets.py",
+    "src/data_bootstrap.py",
 ]
 
 GLOBS = [
+    "src/**/*.py",
     "data/processed/gwanak_gangseo_*.csv",
     "data/processed/ganak_rent_clean.csv",
     "data/processed/ganak_sale_clean.csv",

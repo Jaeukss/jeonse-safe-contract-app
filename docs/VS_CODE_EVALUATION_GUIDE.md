@@ -9,9 +9,12 @@
 VSCode에서 프로젝트 폴더를 열고 터미널에서 실행한다.
 
 ```bash
+python scripts/bootstrap_data.py
 python scripts/evaluate_price_model_errors.py
 python scripts/segment_price_model_improvement.py
 ```
+
+`scripts/bootstrap_data.py`는 `artifacts/gwanak_gangseo_final_used_files.zip`을 풀어 전처리 CSV, RAG corpus, 모델 평가 산출물을 준비한다. 배포 환경에서는 `JEONSE_DATA_ZIP_URL`에 같은 zip의 다운로드 URL을 넣으면 된다.
 
 모델과 평가 데이터까지 다시 만들고 싶으면 아래 순서로 실행한다.
 

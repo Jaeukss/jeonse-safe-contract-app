@@ -5,15 +5,32 @@ from typing import Any
 
 import pandas as pd
 
+from src.data_bootstrap import ensure_data_available
 
 ROOT = Path(__file__).resolve().parents[2]
-RENT_PATH = ROOT / "data" / "processed" / "ganak_rent_clean.csv"
-SALE_PATH = ROOT / "data" / "processed" / "ganak_sale_clean.csv"
+RENT_PATHS = [
+    ROOT / "data" / "processed" / "gwanak_gangseo_rent_clean.csv",
+    ROOT / "data" / "processed" / "ganak_rent_clean.csv",
+]
+SALE_PATHS = [
+    ROOT / "data" / "processed" / "gwanak_gangseo_sale_clean.csv",
+    ROOT / "data" / "processed" / "ganak_sale_clean.csv",
+]
+
+
+def _first_existing(paths: list[Path]) -> Path | None:
+    for path in paths:
+        if path.exists():
+            return path
+    return None
 
 
 def load_market_data() -> tuple[pd.DataFrame, pd.DataFrame]:
-    rent = pd.read_csv(RENT_PATH) if RENT_PATH.exists() else pd.DataFrame()
-    sale = pd.read_csv(SALE_PATH) if SALE_PATH.exists() else pd.DataFrame()
+    ensure_data_available()
+    rent_path = _first_existing(RENT_PATHS)
+    sale_path = _first_existing(SALE_PATHS)
+    rent = pd.read_csv(rent_path) if rent_path else pd.DataFrame()
+    sale = pd.read_csv(sale_path) if sale_path else pd.DataFrame()
     return rent, sale
 
 

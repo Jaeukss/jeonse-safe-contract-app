@@ -14,6 +14,7 @@ from app.components.document_review import render_document_review
 from app.components.document_upload import render_document_upload
 from app.components.report_view import render_report_view
 from src.agent.graph import run_agent_workflow
+from src.data_bootstrap import ensure_data_available
 from src.input_layer.raw_store import save_raw_input
 
 
@@ -145,6 +146,10 @@ def match_public_building(address: str) -> dict[str, Any] | None:
     public_data = {
         "public_building_matched": True,
         "public_building_match_score": int(row["_score"]),
+        "building_register_pk": str(row.get("building_register_pk")) if pd.notna(row.get("building_register_pk")) else None,
+        "legal_dong_code": str(row.get("legal_dong_code")) if pd.notna(row.get("legal_dong_code")) else None,
+        "bun": str(row.get("bun")) if pd.notna(row.get("bun")) else None,
+        "ji": str(row.get("ji")) if pd.notna(row.get("ji")) else None,
         "public_building_address": lot_address,
         "public_building_road_address": row.get("road_address"),
         "public_building_gross_area_m2": float(gross_area) if pd.notna(gross_area) else None,
@@ -323,6 +328,18 @@ def render_pre_input_section() -> str:
 
 def main() -> None:
     st.set_page_config(page_title="전세계약 안심진단", page_icon="H", layout="wide")
+    data_status = ensure_data_available()
+    with st.sidebar:
+        st.markdown("### 데이터 상태")
+        if data_status.ready:
+            st.success(data_status.message)
+        else:
+            st.error(data_status.message)
+        if data_status.enriched_missing:
+            st.caption("보조 데이터 일부 없음: " + ", ".join(data_status.enriched_missing[:2]))
+        if data_status.source:
+            st.caption(f"데이터 소스: {data_status.source}")
+
     session_id = st.session_state.setdefault("session_id", f"S-{uuid4().hex[:8].upper()}")
     user_mode = render_pre_input_section()
     st.session_state["user_mode"] = user_mode

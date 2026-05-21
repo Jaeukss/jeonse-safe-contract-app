@@ -39,6 +39,8 @@ def generate_markdown_report(result: dict[str, Any]) -> str:
         "",
         f"- 예측 적정 전세가: {money(market.get('predicted_rent_price'))}",
         f"- 예측 매매가: {money(market.get('predicted_sale_price'))}",
+        f"- 주택가격 보조값: {money(market.get('official_house_price'))}",
+        f"- 산출 방식: {market.get('model_note', '확인 불가')}",
         f"- 전세가율: {market.get('jeonse_ratio')}%",
         f"- 시세괴리율: {market.get('rent_gap_rate')}%",
         f"- 유사 거래 수: {market.get('similar_transaction_count')}건",
