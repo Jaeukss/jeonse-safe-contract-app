@@ -2,6 +2,8 @@ from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
+from app.components.document_upload import build_basic_prefill
+
 
 SAMPLE_CONTRACT_TEXT = (
     "주소: 서울 강서구 화곡동 1027-8 해든빌라 402호\n"
@@ -30,6 +32,25 @@ def test_pasted_document_prefills_basic_inputs():
     assert app.session_state["basic_built_year"] == 2016
     assert app.session_state["basic_contract_stage"] == "계약 전 확인"
     assert app.session_state["basic_address"].startswith("서울 강서구")
+
+
+def test_build_basic_prefill_keeps_zero_monthly_rent():
+    prefill = build_basic_prefill(
+        [
+            {
+                "source": "explanation_ocr",
+                "data": {
+                    "address": "서울 강서구 화곡동 1027-8 해든빌라 402호",
+                    "deposit": 270_000_000,
+                    "monthly_rent": 0,
+                },
+            }
+        ]
+    )
+
+    assert prefill["address"].startswith("서울 강서구")
+    assert prefill["deposit"] == 270_000_000
+    assert prefill["monthly_rent"] == 0
 
 
 def test_uploaded_pdf_is_cached_and_parsed():

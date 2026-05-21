@@ -9,6 +9,13 @@ from app.components.basic_input import apply_basic_defaults
 from src.document_ai.upload_handler import handle_text_input, handle_upload
 
 
+PREFILL_SOURCE_PRIORITY = {
+    "explanation_ocr": 0,
+    "manual_correction": 1,
+    "registry_ocr": 2,
+    "building_ocr": 3,
+}
+
 BASIC_PREFILL_FIELDS = {
     "address": "주소",
     "housing_type": "주택유형",
@@ -21,6 +28,19 @@ BASIC_PREFILL_FIELDS = {
 }
 
 
+def _has_prefill_value(field: str, value: Any) -> bool:
+    if value in (None, ""):
+        return False
+    if field == "monthly_rent":
+        return isinstance(value, (int, float)) or str(value).strip() != ""
+    if field in {"deposit", "area_m2", "floor", "built_year"}:
+        try:
+            return float(value) != 0
+        except (TypeError, ValueError):
+            return False
+    return True
+
+
 def _field_value(record: dict[str, Any], field: str) -> Any:
     data = record.get("data", {})
     if field == "built_year":
@@ -30,14 +50,69 @@ def _field_value(record: dict[str, Any], field: str) -> Any:
 
 def build_basic_prefill(records: list[dict[str, Any]]) -> dict[str, Any]:
     prefill: dict[str, Any] = {}
-    priority = ["explanation_ocr", "building_ocr", "registry_ocr"]
-    ordered = sorted(records, key=lambda item: priority.index(item["source"]) if item.get("source") in priority else len(priority))
+    ordered = sorted(records, key=lambda item: PREFILL_SOURCE_PRIORITY.get(str(item.get("source")), 99))
     for record in ordered:
         for field in BASIC_PREFILL_FIELDS:
             value = _field_value(record, field)
-            if value not in (None, "", 0) and field not in prefill:
+            if _has_prefill_value(field, value) and field not in prefill:
                 prefill[field] = value
     return prefill
+
+
+def _to_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default
+
+
+def _to_float(value: Any, default: float = 1.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _editable_prefill(st: Any, prefill: dict[str, Any]) -> dict[str, Any]:
+    edited: dict[str, Any] = {}
+    col1, col2 = st.columns(2)
+    with col1:
+        if "address" in prefill:
+            edited["address"] = st.text_input("추출 주소", value=str(prefill["address"]), key="prefill_address")
+        if "housing_type" in prefill:
+            edited["housing_type"] = st.text_input("추출 주택유형", value=str(prefill["housing_type"]), key="prefill_housing_type")
+        if "contract_stage" in prefill:
+            edited["contract_stage"] = st.text_input("추출 계약 단계", value=str(prefill["contract_stage"]), key="prefill_contract_stage")
+    with col2:
+        if "deposit" in prefill:
+            edited["deposit"] = st.number_input("추출 보증금", min_value=0, step=10_000_000, value=_to_int(prefill["deposit"]), key="prefill_deposit")
+        if "monthly_rent" in prefill:
+            edited["monthly_rent"] = st.number_input("추출 월세", min_value=0, step=50_000, value=_to_int(prefill["monthly_rent"]), key="prefill_monthly_rent")
+        if "area_m2" in prefill:
+            edited["area_m2"] = st.number_input("추출 전용면적(㎡)", min_value=1.0, step=1.0, value=_to_float(prefill["area_m2"]), key="prefill_area_m2")
+        if "floor" in prefill:
+            edited["floor"] = st.number_input("추출 층", min_value=-5, max_value=80, step=1, value=_to_int(prefill["floor"]), key="prefill_floor")
+        if "built_year" in prefill:
+            edited["built_year"] = st.number_input("추출 건축연도", min_value=1900, max_value=2100, step=1, value=_to_int(prefill["built_year"], 2005), key="prefill_built_year")
+    return edited
+
+
+def _seed_prefill_widgets(st: Any, prefill: dict[str, Any], digest: str) -> None:
+    if st.session_state.get("prefill_widget_digest") == digest:
+        return
+    widget_values = {
+        "prefill_address": str(prefill.get("address", "")),
+        "prefill_housing_type": str(prefill.get("housing_type", "")),
+        "prefill_contract_stage": str(prefill.get("contract_stage", "")),
+        "prefill_deposit": _to_int(prefill.get("deposit")),
+        "prefill_monthly_rent": _to_int(prefill.get("monthly_rent")),
+        "prefill_area_m2": _to_float(prefill.get("area_m2")),
+        "prefill_floor": _to_int(prefill.get("floor")),
+        "prefill_built_year": _to_int(prefill.get("built_year"), 2005),
+    }
+    for key, value in widget_values.items():
+        st.session_state[key] = value
+    st.session_state["prefill_widget_digest"] = digest
 
 
 def _format_prefill(prefill: dict[str, Any]) -> list[dict[str, Any]]:
@@ -124,9 +199,18 @@ def _render_prefill_controls(st: Any, prefill: dict[str, Any]) -> None:
 
     with st.expander("문서에서 추출한 기본정보", expanded=True):
         st.table(_format_prefill(prefill))
-        if st.button("문서 추출값으로 기본정보 덮어쓰기", use_container_width=True):
-            apply_basic_defaults(st, prefill, overwrite=True)
-            st.success("문서 추출값을 기본정보에 반영했습니다.")
+        st.caption("추출값이 틀리면 여기서 먼저 고친 뒤 기본정보에 반영하세요. 월세가 없으면 0원으로 둡니다.")
+        _seed_prefill_widgets(st, prefill, digest)
+        edited_prefill = _editable_prefill(st, prefill)
+        if st.button("문서 추출값/수정값으로 기본정보 덮어쓰기", use_container_width=True):
+            changed = apply_basic_defaults(st, edited_prefill, overwrite=True)
+            st.session_state["auto_prefill_digest"] = digest
+            if changed:
+                st.success("문서 추출값을 기본정보 입력칸에 반영했습니다.")
+            else:
+                st.info("이미 기본정보 입력칸에 같은 값이 들어 있습니다.")
+            if hasattr(st, "rerun"):
+                st.rerun()
 
 
 def render_document_upload(st: Any, session_id: str) -> list[dict[str, Any]]:
