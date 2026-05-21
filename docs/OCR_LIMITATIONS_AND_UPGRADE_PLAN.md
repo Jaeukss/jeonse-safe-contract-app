@@ -30,7 +30,7 @@
 1. 실제 익명화 계약서, 등기부등본, 건축물대장 샘플을 모아 OCR 실패 유형을 분류한다.
 2. OCR 원문과 정답 JSON을 함께 저장해 항목별 추출 정확도 평가셋을 만든다.
 3. EasyOCR, PaddleOCR, CLOVA OCR, Google Document AI 중 비용과 품질을 비교한다.
-4. 개인정보 마스킹 후 OpenRouter의 `deepseek/deepseek-v4-flash:free`를 기본 모델로 사용하고, 실패 시 `nvidia/nemotron-3-super-120b-a12b:free`로 fallback해 주소, 보증금, 월세, 면적, 층, 권리관계 신호를 JSON 추출한다.
+4. 개인정보 마스킹 후 OpenRouter의 `nvidia/nemotron-3-super-120b-a12b:free`를 단일 메인 모델로 사용해 주소, 보증금, 월세, 면적, 층, 권리관계 신호를 JSON 추출한다.
 5. OCR 신뢰도와 LLM JSON 신뢰도를 함께 표시하고, 낮은 항목은 사용자 확인을 강제한다.
 6. 표 위치 정보가 필요한 문서는 layout-aware OCR 또는 PDF table extraction을 별도 경로로 분리한다.
 

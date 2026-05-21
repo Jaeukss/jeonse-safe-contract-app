@@ -9,8 +9,7 @@ import requests
 
 
 OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
-DEFAULT_OPENROUTER_MODEL = "deepseek/deepseek-v4-flash:free"
-FALLBACK_OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+DEFAULT_OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
 REQUEST_TIMEOUT_SECONDS = 30
 
 logger = logging.getLogger(__name__)
@@ -152,9 +151,8 @@ def call_openrouter_with_fallback(
     timeout: int = REQUEST_TIMEOUT_SECONDS,
 ) -> str | None:
     """
-    1차: deepseek/deepseek-v4-flash:free
-    실패 시: nvidia/nemotron-3-super-120b-a12b:free
-    둘 다 실패하면 Streamlit 화면에 안전한 에러 메시지 출력
+    Nvidia OpenRouter 모델을 단일 메인 모델로 호출합니다.
+    기존 호출부 호환을 위해 함수명은 유지합니다.
     """
 
     api_key = get_openrouter_api_key()
@@ -172,17 +170,5 @@ def call_openrouter_with_fallback(
             timeout,
         )
     except OpenRouterCallError as error:
-        _notify_warning(f"DeepSeek 호출 실패로 fallback 모델을 시도합니다. 원인: {_safe_error_reason(error)}")
-
-    try:
-        return _call_openrouter_model(
-            FALLBACK_OPENROUTER_MODEL,
-            messages,
-            api_key,
-            temperature,
-            max_tokens,
-            timeout,
-        )
-    except OpenRouterCallError as error:
-        _notify_error(f"OpenRouter fallback 호출 실패: {_safe_error_reason(error)}")
+        _notify_error(f"OpenRouter 모델 호출 실패: {_safe_error_reason(error)}")
         return None

@@ -18,7 +18,7 @@ class FakeResponse:
         return self._payload
 
 
-def test_openrouter_call_falls_back_to_second_model(monkeypatch):
+def test_openrouter_call_uses_nvidia_model(monkeypatch):
     calls = []
     monkeypatch.setattr(openrouter_client, "_secret_from_streamlit", lambda: None)
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
@@ -26,8 +26,6 @@ def test_openrouter_call_falls_back_to_second_model(monkeypatch):
     def fake_post(url, headers, json, timeout):
         calls.append(json["model"])
         assert headers["Authorization"] == "Bearer test-key"
-        if len(calls) == 1:
-            return FakeResponse(500)
         return FakeResponse(200, {"choices": [{"message": {"content": "{\"ok\": true}"}}]})
 
     monkeypatch.setattr(openrouter_client.requests, "post", fake_post)
@@ -35,10 +33,7 @@ def test_openrouter_call_falls_back_to_second_model(monkeypatch):
     result = openrouter_client.call_openrouter_with_fallback([{"role": "user", "content": "test"}])
 
     assert result == "{\"ok\": true}"
-    assert calls == [
-        openrouter_client.DEFAULT_OPENROUTER_MODEL,
-        openrouter_client.FALLBACK_OPENROUTER_MODEL,
-    ]
+    assert calls == [openrouter_client.DEFAULT_OPENROUTER_MODEL]
 
 
 def test_openrouter_call_without_key_returns_none(monkeypatch):
