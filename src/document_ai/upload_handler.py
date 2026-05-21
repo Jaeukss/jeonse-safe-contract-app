@@ -8,7 +8,7 @@ from src.input_layer.raw_store import save_raw_input
 from .document_classifier import classify_document
 from .extract_fields import extract_fields
 from .pii_masking import has_unmasked_pii, mask_pii
-from .text_extractor import extract_text
+from .text_extractor import extract_text_with_diagnostics
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,7 +31,10 @@ def handle_upload(session_id: str, file_obj: BinaryIO, filename: str) -> dict[st
     saved_path = UPLOAD_DIR / f"{session_id}_{Path(filename).name}"
     saved_path.write_bytes(data)
 
-    text, confidence, method = extract_text(data, filename=filename)
+    extraction = extract_text_with_diagnostics(data, filename=filename)
+    text = extraction.text
+    confidence = extraction.confidence
+    method = extraction.method
     masked_text, pii_counts = mask_pii(text)
     pii_blocked = has_unmasked_pii(masked_text)
     document_type = classify_document(masked_text)
@@ -47,6 +50,7 @@ def handle_upload(session_id: str, file_obj: BinaryIO, filename: str) -> dict[st
         "record": record,
         "document_type": document_type,
         "method": method,
+        "ocr_error": extraction.ocr_error,
         "text": masked_text,
         "pii_counts": pii_counts,
         "pii_blocked": pii_blocked,

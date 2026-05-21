@@ -60,6 +60,23 @@ def _upload_result(st: Any, session_id: str, file: Any) -> dict[str, Any]:
     return result
 
 
+def _format_ocr_error(error: Any) -> str:
+    message = str(error or "").strip()
+    if not message:
+        return ""
+    hints = {
+        "tesseract executable not found": "Tesseract 실행 파일이 설치되어 있지 않습니다.",
+        "tesseract language pack missing": "Tesseract 한국어/영어 언어팩이 설치되어 있지 않습니다.",
+        "pdf render failed": "스캔 PDF를 이미지로 변환하는 과정에서 실패했습니다.",
+        "image open failed": "이미지 파일을 열 수 없습니다.",
+        "tesseract returned empty text": "OCR 엔진이 이미지를 읽었지만 텍스트를 찾지 못했습니다.",
+    }
+    for key, hint in hints.items():
+        if key in message:
+            return f"{hint} 원인: {message}"
+    return f"OCR 처리 중 문제가 발생했습니다. 원인: {message}"
+
+
 def _render_ocr_review(st: Any, session_id: str, result: dict[str, Any], filename: str) -> dict[str, Any]:
     cache_key = str(result["_cache_key"])
     reviewed = st.session_state.setdefault("reviewed_document_results", {})
@@ -116,6 +133,12 @@ def render_document_upload(st: Any, session_id: str) -> list[dict[str, Any]]:
             st.caption(
                 f"{file.name}: {active_result['document_type']} / {active_result['method']} / OCR 신뢰도 {active_result['record'].get('ocr_confidence', 0)}"
             )
+            ocr_error = _format_ocr_error(active_result.get("ocr_error"))
+            if ocr_error:
+                st.warning(
+                    f"{file.name} OCR 경고: {ocr_error} "
+                    "스캔 PDF/이미지라면 아래 OCR 원문 보정란 또는 직접 붙여넣기로 보완해주세요."
+                )
             if active_result["pii_blocked"]:
                 st.warning(f"{file.name}에서 개인정보 마스킹 잔여 가능성이 있어 RAG/LLM 경로를 차단했습니다.")
 

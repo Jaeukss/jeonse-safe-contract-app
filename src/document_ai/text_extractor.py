@@ -1,8 +1,19 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
+import shutil
+import subprocess
 from typing import BinaryIO
+
+
+@dataclass(frozen=True)
+class TextExtractionResult:
+    text: str
+    confidence: float
+    method: str
+    ocr_error: str | None = None
 
 
 def _read_bytes(file_or_path: str | Path | bytes | BinaryIO) -> tuple[bytes, str]:
@@ -44,6 +55,32 @@ def _text_quality(text: str) -> float:
 def _best_text(candidates: list[str]) -> str:
     repaired = [repair_mojibake(candidate).strip() for candidate in candidates if candidate and candidate.strip()]
     return max(repaired, key=_text_quality, default="")
+
+
+def check_tesseract_ready() -> tuple[bool, str]:
+    """Return whether image OCR can run in this environment."""
+
+    if not shutil.which("tesseract"):
+        return False, "tesseract executable not found"
+    try:
+        result = subprocess.run(
+            ["tesseract", "--list-langs"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=5,
+            check=False,
+        )
+    except Exception as exc:
+        return False, f"tesseract check failed: {type(exc).__name__}"
+    if result.returncode != 0:
+        return False, f"tesseract check failed: exit {result.returncode}"
+    languages = {line.strip() for line in result.stdout.splitlines() if line.strip()}
+    missing = sorted({"kor", "eng"} - languages)
+    if missing:
+        return False, f"tesseract language pack missing: {', '.join(missing)}"
+    return True, "ok"
 
 
 def _stringify_pdf_tables(tables: list[list[list[object]]]) -> str:
@@ -92,7 +129,10 @@ def extract_pdf_text(data: bytes) -> str:
     return _best_text(candidates)
 
 
-def _ocr_pil_image(image: object) -> str:
+def _ocr_pil_image(image: object) -> tuple[str, str | None]:
+    ready, status = check_tesseract_ready()
+    if not ready:
+        return "", status
     try:
         import pytesseract
         from PIL import ImageEnhance, ImageOps
@@ -104,54 +144,82 @@ def _ocr_pil_image(image: object) -> str:
         processed = ImageEnhance.Contrast(processed).enhance(1.6)
         processed = ImageEnhance.Sharpness(processed).enhance(1.4)
         processed_text = pytesseract.image_to_string(processed, lang="kor+eng", config="--oem 3 --psm 6")
-        return _best_text([raw_text, processed_text])
-    except Exception:
-        return ""
+        text = _best_text([raw_text, processed_text])
+        if not text.strip():
+            return "", "tesseract returned empty text"
+        return text, None
+    except Exception as exc:
+        return "", f"tesseract OCR failed: {type(exc).__name__}"
 
 
 def extract_image_text(data: bytes) -> str:
+    text, _ = extract_image_text_with_error(data)
+    return text
+
+
+def extract_image_text_with_error(data: bytes) -> tuple[str, str | None]:
     try:
         from PIL import Image
 
         image = Image.open(BytesIO(data))
         return _ocr_pil_image(image)
-    except Exception:
-        return ""
+    except Exception as exc:
+        return "", f"image open failed: {type(exc).__name__}"
 
 
 def extract_pdf_image_text(data: bytes, *, max_pages: int = 5) -> str:
+    text, _ = extract_pdf_image_text_with_error(data, max_pages=max_pages)
+    return text
+
+
+def extract_pdf_image_text_with_error(data: bytes, *, max_pages: int = 5) -> tuple[str, str | None]:
+    ready, status = check_tesseract_ready()
+    if not ready:
+        return "", status
     try:
         import fitz  # PyMuPDF
 
         page_texts: list[str] = []
+        errors: list[str] = []
         with fitz.open(stream=data, filetype="pdf") as doc:
             for page_index in range(min(len(doc), max_pages)):
                 page = doc[page_index]
                 pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
-                page_texts.append(extract_image_text(pixmap.tobytes("png")))
-        return _best_text(page_texts)
-    except Exception:
-        return ""
+                page_text, page_error = extract_image_text_with_error(pixmap.tobytes("png"))
+                page_texts.append(page_text)
+                if page_error:
+                    errors.append(f"page {page_index + 1}: {page_error}")
+        text = _best_text(page_texts)
+        if text.strip():
+            return text, None
+        return "", "; ".join(errors) or "pdf OCR returned empty text"
+    except Exception as exc:
+        return "", f"pdf render failed: {type(exc).__name__}"
 
 
-def extract_text(file_or_path: str | Path | bytes | BinaryIO, *, filename: str | None = None) -> tuple[str, float, str]:
+def extract_text_with_diagnostics(file_or_path: str | Path | bytes | BinaryIO, *, filename: str | None = None) -> TextExtractionResult:
     data, inferred_name = _read_bytes(file_or_path)
     name = (filename or inferred_name or "").lower()
 
     if name.endswith(".pdf"):
         text = extract_pdf_text(data)
         if text.strip():
-            return text.strip(), 0.88, "pdf_text_best"
-        image_text = extract_pdf_image_text(data)
-        return image_text.strip(), 0.52 if image_text.strip() else 0.0, "pdf_ocr"
+            return TextExtractionResult(text.strip(), 0.88, "pdf_text_best")
+        image_text, ocr_error = extract_pdf_image_text_with_error(data)
+        return TextExtractionResult(image_text.strip(), 0.52 if image_text.strip() else 0.0, "pdf_ocr", ocr_error)
 
     if name.endswith((".png", ".jpg", ".jpeg", ".tif", ".tiff")):
-        text = extract_image_text(data)
-        return text.strip(), 0.58 if text.strip() else 0.0, "image_ocr"
+        text, ocr_error = extract_image_text_with_error(data)
+        return TextExtractionResult(text.strip(), 0.58 if text.strip() else 0.0, "image_ocr", ocr_error)
 
     for encoding in ("utf-8", "utf-8-sig", "cp949"):
         try:
-            return repair_mojibake(data.decode(encoding)).strip(), 0.95, "text"
+            return TextExtractionResult(repair_mojibake(data.decode(encoding)).strip(), 0.95, "text")
         except UnicodeDecodeError:
             continue
-    return repair_mojibake(data.decode("utf-8", errors="ignore")).strip(), 0.5, "text_lossy"
+    return TextExtractionResult(repair_mojibake(data.decode("utf-8", errors="ignore")).strip(), 0.5, "text_lossy")
+
+
+def extract_text(file_or_path: str | Path | bytes | BinaryIO, *, filename: str | None = None) -> tuple[str, float, str]:
+    result = extract_text_with_diagnostics(file_or_path, filename=filename)
+    return result.text, result.confidence, result.method

@@ -31,6 +31,27 @@ streamlit run app.py
 
 Python이 PATH에 없다면 로컬 Python 또는 Codex 번들 Python 경로로 실행하세요.
 
+## OCR 엔진 설치
+
+PDF에 텍스트 레이어가 있으면 Python 패키지만으로도 추출될 수 있지만, 스캔 PDF와 PNG/JPG 이미지는 Tesseract 실행 파일과 언어팩이 필요합니다.
+
+Streamlit Cloud, Codespaces, Dev Container 계열 배포에서는 저장소 루트의 `packages.txt`가 다음 시스템 패키지를 설치합니다.
+
+```text
+tesseract-ocr
+tesseract-ocr-kor
+tesseract-ocr-eng
+poppler-utils
+```
+
+Windows 로컬 실행 시에는 Tesseract OCR을 별도로 설치하고, 설치 폴더가 `PATH`에 포함되어야 합니다. 한국어 OCR을 쓰려면 `kor.traineddata` 언어팩도 설치되어 있어야 합니다. 설치 후 아래 명령에서 `kor`와 `eng`가 보여야 합니다.
+
+```powershell
+tesseract --list-langs
+```
+
+앱은 OCR 엔진이나 언어팩이 없을 때 빈 결과만 보여주지 않고, 업로드 화면에 실패 원인을 경고로 표시합니다. 이 경우 OCR 원문 보정란이나 직접 붙여넣기로 문서 내용을 보완해 진단을 계속 진행할 수 있습니다.
+
 ## OpenRouter 설정
 
 LLM 기반 문서 JSON 보정은 OpenRouter API key가 있을 때만 활성화됩니다. 배포자가 설정해야 하는 값은 `OPENROUTER_API_KEY` 하나입니다.
