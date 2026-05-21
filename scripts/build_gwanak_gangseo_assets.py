@@ -587,12 +587,54 @@ def extract_pdf_text(path: Path) -> str:
     return "\n".join(chunks)
 
 
+BAD_TEXT_MARKERS = (
+    "\x00",
+    "8BIM",
+    "Adobe Photoshop",
+    "Times New Roman",
+    "xpacket",
+    "JFIF",
+    "Exif",
+    "ÿØ",
+    "ÿÙ",
+)
+
+
+def _looks_like_binary_line(line: str) -> bool:
+    if any(marker in line for marker in BAD_TEXT_MARKERS):
+        return True
+    if not line:
+        return True
+    visible = sum(1 for char in line if char.isprintable() or char.isspace())
+    korean = sum(1 for char in line if "가" <= char <= "힣")
+    ascii_word = sum(1 for char in line if char.isalnum())
+    return (visible / max(len(line), 1) < 0.75) or (korean == 0 and ascii_word < 12 and len(line) > 80)
+
+
+def clean_extracted_text(text: str) -> str:
+    text = text.replace("\x00", "")
+    cleaned_lines: list[str] = []
+    for raw_line in text.splitlines():
+        line = re.sub(r"\s+", " ", raw_line).strip()
+        if _looks_like_binary_line(line):
+            continue
+        line = re.sub(r"[^0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\s.,;:()\[\]{}<>/\-+*=_%·ㆍ「」『』“”\"'?!㎡]", " ", line)
+        line = re.sub(r"\s+", " ", line).strip()
+        korean = sum(1 for char in line if "가" <= char <= "힣")
+        if len(line) > 80 and korean < 3 and not any(token in line for token in ("http", "HUG", "PDF", "Mobile")):
+            continue
+        if len(line) < 4:
+            continue
+        cleaned_lines.append(line)
+    return "\n".join(cleaned_lines).strip()
+
+
 def extract_document_text(path: Path) -> str:
     if path.suffix.lower() == ".pdf":
-        return extract_pdf_text(path)
+        return clean_extracted_text(extract_pdf_text(path))
     if path.suffix.lower() == ".doc":
-        return rtf_to_text(path.read_bytes())
-    return path.read_text(encoding="utf-8", errors="ignore")
+        return clean_extracted_text(rtf_to_text(path.read_bytes()))
+    return clean_extracted_text(path.read_text(encoding="utf-8", errors="ignore"))
 
 
 def slugify(value: str) -> str:
@@ -608,7 +650,9 @@ def chunk_text(text: str, size: int = 1200, overlap: int = 160) -> list[str]:
     start = 0
     while start < len(text):
         end = min(len(text), start + size)
-        chunks.append(text[start:end].strip())
+        chunk = clean_extracted_text(text[start:end].strip())
+        if chunk:
+            chunks.append(chunk)
         if end == len(text):
             break
         start = max(0, end - overlap)
@@ -623,12 +667,19 @@ def build_rag_docs() -> dict[str, Any]:
     with corpus_path.open("w", encoding="utf-8") as corpus_file:
         for category, title, file_name in RAG_SOURCES:
             path = RAW_BASE / file_name
-            if not path.exists():
-                source_manifest.append({"category": category, "title": title, "source_file": str(path), "status": "missing"})
-                continue
-            text = extract_document_text(path)
             slug = slugify(title)
             md_path = RAG_PROCESSED_DIR / f"{slug}.md"
+            if not path.exists():
+                if md_path.exists():
+                    existing = md_path.read_text(encoding="utf-8", errors="ignore")
+                    text = clean_extracted_text(existing)
+                    source_status = "processed_from_existing_md"
+                else:
+                    source_manifest.append({"category": category, "title": title, "source_file": str(path), "status": "missing"})
+                    continue
+            else:
+                text = extract_document_text(path)
+                source_status = "processed"
             md_path.write_text(
                 f"# {title}\n\n- category: {category}\n- source_file: {path.name}\n- processed_at: {datetime.now().isoformat(timespec='seconds')}\n\n{text}\n",
                 encoding="utf-8",
@@ -658,14 +709,14 @@ def build_rag_docs() -> dict[str, Any]:
                     "processed_file": str(md_path),
                     "characters": len(text),
                     "chunks": len(chunks),
-                    "status": "processed",
+                    "status": source_status,
                 }
             )
     manifest_path = RAG_PROCESSED_DIR / "rag_source_manifest_gwanak_gangseo.json"
     manifest_path.write_text(json.dumps(source_manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     return {
         "source_count": len(source_manifest),
-        "processed_sources": sum(1 for item in source_manifest if item["status"] == "processed"),
+        "processed_sources": sum(1 for item in source_manifest if item["status"].startswith("processed")),
         "chunk_count": chunk_count,
         "corpus_file": str(corpus_path),
         "manifest_file": str(manifest_path),
