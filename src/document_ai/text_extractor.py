@@ -38,6 +38,20 @@ def extract_pdf_text(data: bytes) -> str:
         return ""
 
 
+def repair_mojibake(text: str) -> str:
+    """Recover common UTF-8 text that was decoded as latin-1/cp1252 by PDF extractors."""
+    if not text:
+        return ""
+    original_korean = sum(1 for char in text if "가" <= char <= "힣")
+    candidates = [text]
+    for encoding in ("latin1", "cp1252"):
+        try:
+            candidates.append(text.encode(encoding, errors="strict").decode("utf-8", errors="strict"))
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            continue
+    return max(candidates, key=lambda candidate: sum(1 for char in candidate if "가" <= char <= "힣") - original_korean / 2)
+
+
 def extract_image_text(data: bytes) -> str:
     try:
         from io import BytesIO
@@ -58,17 +72,17 @@ def extract_text(file_or_path: str | Path | bytes | BinaryIO, *, filename: str |
     if name.endswith(".pdf"):
         text = extract_pdf_text(data)
         if text.strip():
-            return text.strip(), 0.86, "pdf_text"
+            return repair_mojibake(text).strip(), 0.86, "pdf_text"
         image_text = extract_image_text(data)
-        return image_text.strip(), 0.45 if image_text.strip() else 0.0, "pdf_ocr"
+        return repair_mojibake(image_text).strip(), 0.45 if image_text.strip() else 0.0, "pdf_ocr"
 
     if name.endswith((".png", ".jpg", ".jpeg", ".tif", ".tiff")):
         text = extract_image_text(data)
-        return text.strip(), 0.55 if text.strip() else 0.0, "image_ocr"
+        return repair_mojibake(text).strip(), 0.55 if text.strip() else 0.0, "image_ocr"
 
     for encoding in ("utf-8", "cp949"):
         try:
-            return data.decode(encoding).strip(), 0.95, "text"
+            return repair_mojibake(data.decode(encoding)).strip(), 0.95, "text"
         except UnicodeDecodeError:
             continue
-    return data.decode("utf-8", errors="ignore").strip(), 0.5, "text_lossy"
+    return repair_mojibake(data.decode("utf-8", errors="ignore")).strip(), 0.5, "text_lossy"

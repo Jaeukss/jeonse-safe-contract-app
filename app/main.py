@@ -8,7 +8,7 @@ from uuid import uuid4
 import pandas as pd
 import streamlit as st
 
-from app.components.basic_input import render_basic_input
+from app.components.basic_input import apply_basic_defaults, render_basic_input
 from app.components.conflict_view import render_conflict_view
 from app.components.document_review import render_document_review
 from app.components.document_upload import render_document_upload
@@ -353,6 +353,7 @@ def main() -> None:
             "monthly_rent": 0,
             "area_m2": 27.1,
             "floor": 2,
+            "built_year": 2004,
         },
         "전세가율이 높은 빌라": {
             "address": "서울 강서구 화곡동 1027-8 해든빌라 402호",
@@ -361,6 +362,7 @@ def main() -> None:
             "monthly_rent": 0,
             "area_m2": 42.1,
             "floor": 4,
+            "built_year": 2016,
         },
         "신탁 확인이 필요한 다가구": {
             "address": "서울시 관악구 봉천동 1-52",
@@ -369,10 +371,14 @@ def main() -> None:
             "monthly_rent": 0,
             "area_m2": 60.0,
             "floor": 2,
+            "built_year": 1991,
         },
     }
-    selected_case = st.selectbox("빠른 테스트 예시", list(quick_cases.keys()))
+    selected_case = st.selectbox("빠른 테스트 예시", list(quick_cases.keys()), key="quick_case")
     defaults = quick_cases[selected_case] or {}
+    if selected_case != st.session_state.get("last_applied_quick_case") and defaults:
+        apply_basic_defaults(st, defaults, overwrite=True)
+        st.session_state["last_applied_quick_case"] = selected_case
 
     upload_records = render_document_upload(st, session_id)
 

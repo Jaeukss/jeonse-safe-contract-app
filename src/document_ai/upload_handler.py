@@ -51,3 +51,25 @@ def handle_upload(session_id: str, file_obj: BinaryIO, filename: str) -> dict[st
         "pii_counts": pii_counts,
         "pii_blocked": pii_blocked,
     }
+
+
+def handle_text_input(session_id: str, text: str, filename: str = "pasted_document.txt") -> dict[str, object]:
+    masked_text, pii_counts = mask_pii(text or "")
+    pii_blocked = has_unmasked_pii(masked_text)
+    document_type = classify_document(masked_text)
+    fields = extract_fields(document_type, masked_text) if not pii_blocked else {"pii_blocked": True}
+    record = save_raw_input(
+        session_id=session_id,
+        source=SOURCE_BY_TYPE[document_type],  # type: ignore[arg-type]
+        data=fields,
+        file_name=filename,
+        ocr_confidence=0.98,
+    )
+    return {
+        "record": record,
+        "document_type": document_type,
+        "method": "pasted_text",
+        "text": masked_text,
+        "pii_counts": pii_counts,
+        "pii_blocked": pii_blocked,
+    }

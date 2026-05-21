@@ -13,3 +13,9 @@ data/models/seoul_multi_year_ml_dl_benchmark.json
 data/models/gwanak_gangseo_price_model_tables.json
 data/rag_docs/processed/
 data/model_diagnostics/*.csv
+
+# Runtime stores generated while using the local Streamlit MVP.
+data/raw/user_uploads/
+data/raw_inputs/
+data/ocr_results/
+data/snapshots/

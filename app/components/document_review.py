@@ -18,7 +18,7 @@ def _yes_no_unknown(st: Any, label: str, key: str) -> bool | None:
 
 
 def _checked_state(st: Any, label: str, key: str) -> bool | None:
-    value = st.radio(label, [UNCHECKED, CHECKED, UNKNOWN], key=key, horizontal=True)
+    value = st.radio(label, [UNKNOWN, CHECKED, UNCHECKED], key=key, horizontal=True)
     if value == UNKNOWN:
         return None
     return value == CHECKED

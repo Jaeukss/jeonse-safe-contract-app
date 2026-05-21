@@ -5,10 +5,13 @@ import re
 
 def parse_building_text(text: str) -> dict[str, object]:
     raw = text or ""
+    compact = re.sub(r"\s+", "", raw)
     usage_match = re.search(r"(?:주용도|용도)\s*[:：]?\s*([^\n\r]+)", raw)
     area_match = re.search(r"(?:전유부분|전용면적|면적)\s*[:：]?\s*(\d+(?:\.\d+)?)", raw)
     year_match = re.search(r"(?:사용승인일|사용승인연도|사용승인)\s*[:：]?\s*(\d{4})", raw)
-    violation = "위반건축물" in raw or bool(re.search(r"위반\s*[:：]?\s*(?:Y|예|해당)", raw))
+    violation = bool(re.search(r"위반(?:건축물)?(?:표시)?(?:[:：])?(?:있음|Y|예|해당)", compact))
+    if re.search(r"위반(?:건축물)?(?:표시)?(?:[:：])?(?:없음|N|아니오|미해당)", compact):
+        violation = False
     main_usage = usage_match.group(1).strip() if usage_match else None
     return {
         "building_register_checked": bool(raw.strip()),
