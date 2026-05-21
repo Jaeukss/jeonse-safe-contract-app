@@ -144,7 +144,7 @@ def _call_openrouter_model(
     return content.strip()
 
 
-def call_openrouter_with_fallback(
+def call_openrouter(
     messages: list[dict[str, str]],
     temperature: float = 0.2,
     max_tokens: int = 1000,

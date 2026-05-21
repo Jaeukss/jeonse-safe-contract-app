@@ -4,7 +4,7 @@ import json
 import re
 from typing import Any
 
-from src.llm.openrouter_client import call_openrouter_with_fallback, has_openrouter_api_key
+from src.llm.openrouter_client import call_openrouter, has_openrouter_api_key
 
 from .document_classifier import DocumentType
 
@@ -69,7 +69,7 @@ def extract_with_llm_if_configured(document_type: DocumentType, text: str) -> di
             ),
         },
     ]
-    content = call_openrouter_with_fallback(messages, temperature=0.0, max_tokens=1200)
+    content = call_openrouter(messages, temperature=0.0, max_tokens=1200)
     if not content:
         return {}
     return _parse_llm_json(content)

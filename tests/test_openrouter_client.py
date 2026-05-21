@@ -30,7 +30,7 @@ def test_openrouter_call_uses_nvidia_model(monkeypatch):
 
     monkeypatch.setattr(openrouter_client.requests, "post", fake_post)
 
-    result = openrouter_client.call_openrouter_with_fallback([{"role": "user", "content": "test"}])
+    result = openrouter_client.call_openrouter([{"role": "user", "content": "test"}])
 
     assert result == "{\"ok\": true}"
     assert calls == [openrouter_client.DEFAULT_OPENROUTER_MODEL]
@@ -40,4 +40,4 @@ def test_openrouter_call_without_key_returns_none(monkeypatch):
     monkeypatch.setattr(openrouter_client, "_secret_from_streamlit", lambda: None)
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
 
-    assert openrouter_client.call_openrouter_with_fallback([{"role": "user", "content": "test"}]) is None
+    assert openrouter_client.call_openrouter([{"role": "user", "content": "test"}]) is None
