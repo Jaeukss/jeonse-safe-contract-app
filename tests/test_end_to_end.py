@@ -39,3 +39,5 @@ def test_agent_workflow_creates_report(tmp_path, monkeypatch):
 
     assert result["grade"]["grade"] in {"확인 양호", "주의", "위험", "고위험", "검토불가"}
     assert "전세계약 위험진단 리포트" in result["report_markdown"]
+    assert "https://www.iros.go.kr" in result["report_markdown"]
+    assert "https://onestop.khug.or.kr/webView/webBiz/apply/goods001" in result["report_markdown"]

@@ -45,6 +45,29 @@ def test_basic_info_parser_extracts_contract_fields():
     assert result["built_year"] == 2016
 
 
+def test_basic_info_parser_extracts_all_basic_input_fields_from_common_labels():
+    result = extract_basic_info(
+        "임대차계약서\n"
+        "임대차목적물 소재지: 서울특별시 강서구 화곡동 999-1 테스트빌라 201호\n"
+        "주택 유형: 연립주택\n"
+        "임대차보증금: 금 1억 5천만원\n"
+        "월차임: 30만원\n"
+        "전유면적: 33.50㎡\n"
+        "해당층: 제2층\n"
+        "사용승인일: 2010.05.01\n"
+        "계약일: 2026.05.21"
+    )
+
+    assert result["address"] == "서울특별시 강서구 화곡동 999-1 테스트빌라 201호"
+    assert result["housing_type"] == "연립다세대"
+    assert result["contract_stage"] == "계약 당일"
+    assert result["deposit"] == 150_000_000
+    assert result["monthly_rent"] == 300_000
+    assert result["area_m2"] == 33.5
+    assert result["floor"] == 2
+    assert result["built_year"] == 2010
+
+
 def test_pii_masking_blocks_resident_number():
     masked, counts = mask_pii("임대인 900101-1234567 연락처 010-1234-5678")
 

@@ -17,6 +17,7 @@ BASIC_PREFILL_FIELDS = {
     "area_m2": "전용면적",
     "floor": "층",
     "built_year": "건축연도",
+    "contract_stage": "계약 단계",
 }
 
 

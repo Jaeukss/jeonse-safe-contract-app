@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from src.risk.document_signals import build_document_signal_cards
+from src.report.generate_report import official_check_links
 
 
 def render_report_view(st: Any, result: dict[str, Any]) -> None:
@@ -34,6 +35,10 @@ def render_report_view(st: Any, result: dict[str, Any]) -> None:
     st.markdown("### 다음 행동")
     for action in result["actions"]:
         st.markdown(f"- {action}")
+
+    st.markdown("### 공식 확인 링크")
+    for item in official_check_links():
+        st.markdown(f"- [{item['title']}]({item['url']})")
 
     st.download_button(
         "Markdown 리포트 다운로드",
