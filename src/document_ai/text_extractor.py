@@ -46,6 +46,18 @@ def _best_text(candidates: list[str]) -> str:
     return max(repaired, key=_text_quality, default="")
 
 
+def _stringify_pdf_tables(tables: list[list[list[object]]]) -> str:
+    lines: list[str] = []
+    for table in tables:
+        for row in table:
+            values = [str(cell).strip() for cell in row if cell not in (None, "")]
+            if values:
+                lines.append(" | ".join(values))
+        if lines and lines[-1]:
+            lines.append("")
+    return "\n".join(lines)
+
+
 def extract_pdf_text(data: bytes) -> str:
     candidates: list[str] = []
 
@@ -62,6 +74,10 @@ def extract_pdf_text(data: bytes) -> str:
 
         with pdfplumber.open(BytesIO(data)) as pdf:
             candidates.append("\n".join(page.extract_text() or "" for page in pdf.pages))
+            table_texts = []
+            for page in pdf.pages:
+                table_texts.append(_stringify_pdf_tables(page.extract_tables() or []))
+            candidates.append("\n".join(table_texts))
     except Exception:
         pass
 

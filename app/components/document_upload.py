@@ -55,7 +55,30 @@ def _upload_result(st: Any, session_id: str, file: Any) -> dict[str, Any]:
     cache = st.session_state.setdefault("uploaded_document_results", {})
     if cache_key not in cache:
         cache[cache_key] = handle_upload(session_id, BytesIO(data), file.name)
-    return cache[cache_key]
+    result = dict(cache[cache_key])
+    result["_cache_key"] = cache_key
+    return result
+
+
+def _render_ocr_review(st: Any, session_id: str, result: dict[str, Any], filename: str) -> dict[str, Any]:
+    cache_key = str(result["_cache_key"])
+    reviewed = st.session_state.setdefault("reviewed_document_results", {})
+    active_result = reviewed.get(cache_key, result)
+    raw_text = str(active_result.get("text") or result.get("text") or "")
+    text_key = f"ocr_review_text_{hashlib.sha256(cache_key.encode('utf-8')).hexdigest()[:12]}"
+
+    with st.expander(f"{filename} OCR 원문 확인·수정", expanded=False):
+        st.caption("OCR이 주소, 보증금, 월세, 층수 등을 잘못 읽었으면 여기서 고친 뒤 다시 분석하세요.")
+        edited_text = st.text_area("OCR 원문", value=raw_text, height=180, key=text_key)
+        cols = st.columns([1, 2])
+        if cols[0].button("수정한 텍스트로 다시 분석", key=f"reanalyze_{text_key}", use_container_width=True):
+            reviewed[cache_key] = handle_text_input(session_id, edited_text, filename=f"edited_{filename}.txt")
+            st.session_state.pop("auto_prefill_digest", None)
+            st.success("수정한 OCR 텍스트를 다시 분석했습니다. 추출값이 기본정보에 다시 반영됩니다.")
+            active_result = reviewed[cache_key]
+        cols[1].caption("API 키 없이 동작하는 MVP라 OCR 원문 보정이 가장 안정적인 안전장치입니다.")
+
+    return active_result
 
 
 def _render_prefill_controls(st: Any, prefill: dict[str, Any]) -> None:
@@ -88,11 +111,12 @@ def render_document_upload(st: Any, session_id: str) -> list[dict[str, Any]]:
     if uploaded_files:
         for file in uploaded_files:
             result = _upload_result(st, session_id, file)
-            records.append(result["record"])
+            active_result = _render_ocr_review(st, session_id, result, file.name)
+            records.append(active_result["record"])
             st.caption(
-                f"{file.name}: {result['document_type']} / {result['method']} / OCR 신뢰도 {result['record'].get('ocr_confidence', 0)}"
+                f"{file.name}: {active_result['document_type']} / {active_result['method']} / OCR 신뢰도 {active_result['record'].get('ocr_confidence', 0)}"
             )
-            if result["pii_blocked"]:
+            if active_result["pii_blocked"]:
                 st.warning(f"{file.name}에서 개인정보 마스킹 잔여 가능성이 있어 RAG/LLM 경로를 차단했습니다.")
 
     pasted_text = st.text_area("문서 텍스트 직접 붙여넣기", height=110, placeholder="OCR이 잘 안 되면 등기부등본/건축물대장/확인설명서에서 보이는 내용을 붙여넣으세요.")

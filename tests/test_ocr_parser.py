@@ -1,4 +1,5 @@
 from src.document_ai.basic_info_parser import extract_basic_info
+from src.document_ai.extract_fields import extract_fields
 from src.document_ai.pii_masking import has_unmasked_pii, mask_pii
 from src.document_ai.registry_parser import parse_money, parse_registry_text
 
@@ -74,3 +75,12 @@ def test_pii_masking_blocks_resident_number():
     assert counts["resident_registration_number"] == 1
     assert counts["phone"] == 1
     assert not has_unmasked_pii(masked)
+
+
+def test_extract_fields_runs_without_llm_api_key(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    result = extract_fields("explanation", "주소: 서울 강서구 화곡동 1-1\n보증금: 1억\n월차임: 20만원")
+
+    assert result["address"] == "서울 강서구 화곡동 1-1"
+    assert result["deposit"] == 100_000_000
+    assert result["monthly_rent"] == 200_000
