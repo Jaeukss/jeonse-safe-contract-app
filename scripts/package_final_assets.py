@@ -10,6 +10,7 @@ OUTPUT = ROOT / "artifacts" / "gwanak_gangseo_final_used_files.zip"
 
 
 EXPLICIT_FILES = [
+    ".streamlit/config.toml",
     "artifacts/gwanak_gangseo_processing_report.json",
     "app.py",
     "app/main.py",
