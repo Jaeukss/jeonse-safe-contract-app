@@ -32,7 +32,12 @@ FIELD_PRIORITY = {
     "violation_flag": ["public_building_data", "building_ocr", "manual_correction", "user_checklist"],
     "non_residential_usage_flag": ["public_building_data", "building_ocr", "manual_correction", "user_checklist"],
     "deposit": ["explanation_ocr", "user_input"],
-    "area_m2": ["building_ocr", "user_input"],
+    "monthly_rent": ["explanation_ocr", "user_input"],
+    "area_m2": ["building_ocr", "explanation_ocr", "registry_ocr", "user_input"],
+    "floor": ["building_ocr", "registry_ocr", "explanation_ocr", "user_input"],
+    "unit_dong": ["registry_ocr", "building_ocr", "explanation_ocr", "user_input"],
+    "room": ["registry_ocr", "building_ocr", "explanation_ocr", "user_input"],
+    "contract_type": ["explanation_ocr", "registry_ocr", "user_input"],
 }
 
 
