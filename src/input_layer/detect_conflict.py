@@ -8,7 +8,10 @@ BOOLEAN_FIELDS = {
     "seizure_flag",
     "provisional_seizure_flag",
     "trust_flag",
+    "jeonse_right_flag",
     "leasehold_registration_flag",
+    "ownership_transfer_recent_flag",
+    "registry_warning_flag",
     "violation_flag",
     "non_residential_usage_flag",
 }
