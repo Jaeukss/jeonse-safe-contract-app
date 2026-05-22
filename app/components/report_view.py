@@ -6,6 +6,27 @@ from src.risk.document_signals import build_document_signal_cards
 from src.report.generate_report import official_check_links
 
 
+def _render_evidence_cards(st: Any, evidence: list[dict[str, Any]]) -> None:
+    st.markdown("### RAG 근거 카드")
+    if not evidence:
+        st.info("현재 위험 신호에 연결된 RAG 근거 카드가 없습니다.")
+        return
+
+    for row_start in range(0, len(evidence), 2):
+        cols = st.columns(2)
+        for col, item in zip(cols, evidence[row_start : row_start + 2]):
+            with col.container(border=True):
+                signal_key = item.get("key") or "evidence"
+                title = item.get("title") or "공식 자료 확인"
+                summary = item.get("summary") or "계약 전 원문 문서와 최신 공적 장부 확인이 필요합니다."
+                url = item.get("url")
+                col.markdown(f"**Evidence Card · {signal_key}**")
+                col.markdown(f"**근거 자료:** {title}")
+                col.write(summary)
+                if url:
+                    col.link_button("공식 근거 열기", str(url), use_container_width=True)
+
+
 def render_report_view(st: Any, result: dict[str, Any]) -> None:
     grade = result["grade"]
     market = result["market"]
@@ -23,7 +44,14 @@ def render_report_view(st: Any, result: dict[str, Any]) -> None:
     for row_start in range(0, len(cards), 3):
         cols = st.columns(3)
         for col, card in zip(cols, cards[row_start : row_start + 3]):
-            col.info(f"{card['label']}: {card['status']}")
+            status = card["status"]
+            message = f"{card['label']}: {status}"
+            if status == "검출":
+                col.warning(message)
+            elif status == "미검출":
+                col.info(message)
+            else:
+                col.info(message)
 
     st.markdown("### 핵심 위험 신호")
     if result["signals"]:
@@ -35,6 +63,8 @@ def render_report_view(st: Any, result: dict[str, Any]) -> None:
     st.markdown("### 다음 행동")
     for action in result["actions"]:
         st.markdown(f"- {action}")
+
+    _render_evidence_cards(st, result.get("evidence", []))
 
     st.markdown("### 공식 확인 링크")
     for item in official_check_links():

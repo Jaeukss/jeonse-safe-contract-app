@@ -5,11 +5,15 @@ from typing import Any
 
 
 HOUSING_TYPES = ["아파트", "오피스텔", "연립다세대", "다가구"]
+CONTRACT_TYPES = ["전세", "월세", "반전세", "기타"]
 CONTRACT_STAGES = ["매물 검토", "계약 전 확인", "계약 당일", "잔금 전", "입주 직전"]
 
 BASIC_FIELD_KEYS = {
     "address": "basic_address",
+    "unit_dong": "basic_unit_dong",
+    "room": "basic_room",
     "housing_type": "basic_housing_type",
+    "contract_type": "basic_contract_type",
     "contract_stage": "basic_contract_stage",
     "deposit": "basic_deposit",
     "monthly_rent": "basic_monthly_rent",
@@ -20,7 +24,10 @@ BASIC_FIELD_KEYS = {
 
 DEFAULT_BASIC_VALUES = {
     "address": "서울시 관악구 신림동",
+    "unit_dong": "",
+    "room": "",
     "housing_type": "다가구",
+    "contract_type": "전세",
     "contract_stage": "계약 전 확인",
     "deposit": 250_000_000,
     "monthly_rent": 0,
@@ -43,8 +50,19 @@ def _coerce_value(field: str, value: Any) -> Any:
         return coerced
     if field == "housing_type" and value not in HOUSING_TYPES:
         return DEFAULT_BASIC_VALUES[field]
+    if field == "contract_type" and value not in CONTRACT_TYPES:
+        text = str(value or "")
+        if "반전세" in text:
+            return "반전세"
+        if "월세" in text or "차임" in text:
+            return "월세"
+        if "전세" in text:
+            return "전세"
+        return "기타"
     if field == "contract_stage" and value not in CONTRACT_STAGES:
         return DEFAULT_BASIC_VALUES[field]
+    if field in {"address", "unit_dong", "room"}:
+        return str(value).strip()
     return value
 
 
@@ -76,6 +94,7 @@ def _district_from_address(address: str) -> str:
 
 
 def _dong_from_address(address: str) -> str:
+    # 법정동/행정동입니다. 건물 동은 unit_dong 필드로 별도 관리합니다.
     match = re.search(r"([가-힣0-9]+동)", address)
     return match.group(1) if match else ""
 
@@ -88,11 +107,14 @@ def render_basic_input(st: Any, defaults: dict[str, Any] | None = None) -> dict[
     col1, col2 = st.columns(2)
     with col1:
         address = st.text_input("주소", key="basic_address")
+        unit_dong = st.text_input("건물 동", key="basic_unit_dong", placeholder="예: 101동")
+        room = st.text_input("호수", key="basic_room", placeholder="예: 704호")
         housing_type = st.selectbox(
             "주택유형",
             HOUSING_TYPES,
             key="basic_housing_type",
         )
+        contract_type = st.selectbox("계약유형", CONTRACT_TYPES, key="basic_contract_type")
         contract_stage = st.selectbox("계약 단계", CONTRACT_STAGES, key="basic_contract_stage")
     with col2:
         deposit = st.number_input("보증금", min_value=0, step=10_000_000, key="basic_deposit")
@@ -105,7 +127,10 @@ def render_basic_input(st: Any, defaults: dict[str, Any] | None = None) -> dict[
         "address": address,
         "district": _district_from_address(address),
         "dong": _dong_from_address(address),
+        "unit_dong": unit_dong.strip(),
+        "room": room.strip(),
         "housing_type": housing_type,
+        "contract_type": contract_type,
         "deposit": int(deposit),
         "monthly_rent": int(monthly_rent),
         "area_m2": float(area_m2),

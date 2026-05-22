@@ -27,7 +27,10 @@ REVIEW_PREFILL_SOURCE_PRIORITY = {
 
 BASIC_PREFILL_FIELDS = {
     "address": "주소",
+    "unit_dong": "건물 동",
+    "room": "호수",
     "housing_type": "주택유형",
+    "contract_type": "계약유형",
     "deposit": "보증금",
     "monthly_rent": "월세",
     "area_m2": "전용면적",
@@ -151,8 +154,14 @@ def _editable_prefill(st: Any, prefill: dict[str, Any]) -> dict[str, Any]:
     with col1:
         if "address" in prefill:
             edited["address"] = st.text_input("추출 주소", value=str(prefill["address"]), key="prefill_address")
+        if "unit_dong" in prefill:
+            edited["unit_dong"] = st.text_input("추출 건물 동", value=str(prefill["unit_dong"]), key="prefill_unit_dong")
+        if "room" in prefill:
+            edited["room"] = st.text_input("추출 호수", value=str(prefill["room"]), key="prefill_room")
         if "housing_type" in prefill:
             edited["housing_type"] = st.text_input("추출 주택유형", value=str(prefill["housing_type"]), key="prefill_housing_type")
+        if "contract_type" in prefill:
+            edited["contract_type"] = st.text_input("추출 계약유형", value=str(prefill["contract_type"]), key="prefill_contract_type")
         if "contract_stage" in prefill:
             edited["contract_stage"] = st.text_input("추출 계약 단계", value=str(prefill["contract_stage"]), key="prefill_contract_stage")
     with col2:
@@ -174,7 +183,10 @@ def _seed_prefill_widgets(st: Any, prefill: dict[str, Any], digest: str) -> None
         return
     widget_values = {
         "prefill_address": str(prefill.get("address", "")),
+        "prefill_unit_dong": str(prefill.get("unit_dong", "")),
+        "prefill_room": str(prefill.get("room", "")),
         "prefill_housing_type": str(prefill.get("housing_type", "")),
+        "prefill_contract_type": str(prefill.get("contract_type", "")),
         "prefill_contract_stage": str(prefill.get("contract_stage", "")),
         "prefill_deposit": _to_int(prefill.get("deposit")),
         "prefill_monthly_rent": _to_int(prefill.get("monthly_rent")),
