@@ -6,6 +6,7 @@ from io import BytesIO
 from typing import Any
 
 from app.components.basic_input import apply_basic_defaults
+from app.components.document_review import apply_document_review_defaults
 from src.document_ai.upload_handler import handle_text_input, handle_upload
 
 
@@ -14,6 +15,14 @@ PREFILL_SOURCE_PRIORITY = {
     "manual_correction": 1,
     "registry_ocr": 2,
     "building_ocr": 3,
+}
+
+REVIEW_PREFILL_SOURCE_PRIORITY = {
+    "registry_ocr": 0,
+    "manual_correction": 1,
+    "explanation_ocr": 2,
+    "building_ocr": 3,
+    "public_building_data": 4,
 }
 
 BASIC_PREFILL_FIELDS = {
@@ -27,6 +36,45 @@ BASIC_PREFILL_FIELDS = {
     "contract_stage": "계약 단계",
 }
 
+REVIEW_PREFILL_FIELDS = {
+    "registry_checked": "등기부등본 확인",
+    "mortgage_flag": "근저당권",
+    "mortgage_amount": "채권최고액",
+    "seizure_flag": "압류",
+    "provisional_seizure_flag": "가압류",
+    "trust_flag": "신탁등기",
+    "jeonse_right_flag": "전세권",
+    "leasehold_registration_flag": "임차권등기",
+    "ownership_transfer_recent_flag": "소유권 변동 단서",
+    "registry_warning_flag": "주의 권리관계",
+    "building_register_checked": "건축물대장 확인",
+    "violation_flag": "위반건축물",
+    "non_residential_usage_flag": "주용도 비주택",
+    "broker_explanation_checked": "확인설명서 수령",
+    "rights_explained": "권리관계 설명",
+    "broker_signed": "공인중개사 서명/날인",
+    "senior_deposit_checked": "선순위 임차보증금 확인",
+}
+
+BOOLEAN_REVIEW_FIELDS = {
+    "registry_checked",
+    "mortgage_flag",
+    "seizure_flag",
+    "provisional_seizure_flag",
+    "trust_flag",
+    "jeonse_right_flag",
+    "leasehold_registration_flag",
+    "ownership_transfer_recent_flag",
+    "registry_warning_flag",
+    "building_register_checked",
+    "violation_flag",
+    "non_residential_usage_flag",
+    "broker_explanation_checked",
+    "rights_explained",
+    "broker_signed",
+    "senior_deposit_checked",
+}
+
 
 def _has_prefill_value(field: str, value: Any) -> bool:
     if value in (None, ""):
@@ -36,6 +84,19 @@ def _has_prefill_value(field: str, value: Any) -> bool:
     if field in {"deposit", "area_m2", "floor", "built_year"}:
         try:
             return float(value) != 0
+        except (TypeError, ValueError):
+            return False
+    return True
+
+
+def _has_review_prefill_value(field: str, value: Any) -> bool:
+    if value in (None, ""):
+        return False
+    if field in BOOLEAN_REVIEW_FIELDS:
+        return isinstance(value, bool)
+    if field == "mortgage_amount":
+        try:
+            return int(float(value)) > 0
         except (TypeError, ValueError):
             return False
     return True
@@ -55,6 +116,17 @@ def build_basic_prefill(records: list[dict[str, Any]]) -> dict[str, Any]:
         for field in BASIC_PREFILL_FIELDS:
             value = _field_value(record, field)
             if _has_prefill_value(field, value) and field not in prefill:
+                prefill[field] = value
+    return prefill
+
+
+def build_document_review_prefill(records: list[dict[str, Any]]) -> dict[str, Any]:
+    prefill: dict[str, Any] = {}
+    ordered = sorted(records, key=lambda item: REVIEW_PREFILL_SOURCE_PRIORITY.get(str(item.get("source")), 99))
+    for record in ordered:
+        for field in REVIEW_PREFILL_FIELDS:
+            value = _field_value(record, field)
+            if _has_review_prefill_value(field, value) and field not in prefill:
                 prefill[field] = value
     return prefill
 
@@ -123,6 +195,24 @@ def _format_prefill(prefill: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def _format_review_value(value: Any) -> str:
+    if value is True:
+        return "있음/확인함"
+    if value is False:
+        return "없음/확인 못함"
+    if isinstance(value, (int, float)):
+        return f"{int(value):,}"
+    return str(value)
+
+
+def _format_review_prefill(prefill: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = []
+    for field, label in REVIEW_PREFILL_FIELDS.items():
+        if field in prefill:
+            rows.append({"항목": label, "추출값": _format_review_value(prefill[field])})
+    return rows
+
+
 def _upload_result(st: Any, session_id: str, file: Any) -> dict[str, Any]:
     data = file.getvalue()
     digest = hashlib.sha256(data).hexdigest()[:16]
@@ -172,13 +262,14 @@ def _render_ocr_review(st: Any, session_id: str, result: dict[str, Any], filenam
     text_key = f"ocr_review_text_{hashlib.sha256(cache_key.encode('utf-8')).hexdigest()[:12]}"
 
     with st.expander(f"{filename} OCR 원문 확인·수정", expanded=False):
-        st.caption("OCR이 주소, 보증금, 월세, 층수 등을 잘못 읽었으면 여기서 고친 뒤 다시 분석하세요.")
+        st.caption("OCR이 주소, 보증금, 권리관계 등을 잘못 읽었으면 여기서 고친 뒤 다시 분석하세요.")
         edited_text = st.text_area("OCR 원문", value=raw_text, height=180, key=text_key)
         cols = st.columns([1, 2])
         if cols[0].button("수정한 텍스트로 다시 분석", key=f"reanalyze_{text_key}", use_container_width=True):
             reviewed[cache_key] = handle_text_input(session_id, edited_text, filename=f"edited_{filename}.txt")
             st.session_state.pop("auto_prefill_digest", None)
-            st.success("수정한 OCR 텍스트를 다시 분석했습니다. 추출값이 기본정보에 다시 반영됩니다.")
+            st.session_state.pop("review_prefill_digest", None)
+            st.success("수정한 OCR 텍스트를 다시 분석했습니다. 추출값이 기본정보와 보완입력에 다시 반영됩니다.")
             active_result = reviewed[cache_key]
         cols[1].caption("API 키 없이 동작하는 MVP라 OCR 원문 보정이 가장 안정적인 안전장치입니다.")
 
@@ -209,6 +300,32 @@ def _render_prefill_controls(st: Any, prefill: dict[str, Any]) -> None:
                 st.success("문서 추출값을 기본정보 입력칸에 반영했습니다.")
             else:
                 st.info("이미 기본정보 입력칸에 같은 값이 들어 있습니다.")
+            if hasattr(st, "rerun"):
+                st.rerun()
+
+
+def _render_review_prefill_controls(st: Any, prefill: dict[str, Any]) -> None:
+    if not prefill:
+        st.info("문서에서 권리관계/확인정보로 바로 반영할 항목은 아직 추출되지 않았습니다. 아래 보완입력에서 직접 선택할 수 있습니다.")
+        return
+
+    digest = hashlib.sha256(json.dumps(prefill, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+    if st.session_state.get("review_prefill_digest") != digest:
+        changed = apply_document_review_defaults(st, prefill, overwrite=True)
+        st.session_state["review_prefill_digest"] = digest
+        if changed:
+            st.success("문서에서 추출한 권리관계/확인정보를 보완입력에 자동 반영했습니다. 값이 다르면 아래에서 직접 수정하세요.")
+
+    with st.expander("문서에서 추출한 권리관계/확인정보", expanded=True):
+        st.table(_format_review_prefill(prefill))
+        st.caption("이 값들은 아래 ‘OCR 결과 확인 및 보완 입력’에 기본값으로 들어갑니다. 사용자가 수정한 값이 최종 진단에 반영됩니다.")
+        if st.button("문서 추출값으로 보완입력 다시 덮어쓰기", use_container_width=True):
+            changed = apply_document_review_defaults(st, prefill, overwrite=True)
+            st.session_state["review_prefill_digest"] = digest
+            if changed:
+                st.success("문서 추출값을 보완입력에 다시 반영했습니다.")
+            else:
+                st.info("이미 보완입력에 같은 값이 들어 있습니다.")
             if hasattr(st, "rerun"):
                 st.rerun()
 
@@ -258,4 +375,5 @@ def render_document_upload(st: Any, session_id: str) -> list[dict[str, Any]]:
             records.append(record)
 
     _render_prefill_controls(st, build_basic_prefill(records))
+    _render_review_prefill_controls(st, build_document_review_prefill(records))
     return records
