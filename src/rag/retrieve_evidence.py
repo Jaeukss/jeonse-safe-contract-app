@@ -19,7 +19,10 @@ SOURCE_BY_SIGNAL = {
     "seizure": "real_estate_registration_act",
     "provisional_seizure": "real_estate_registration_act",
     "trust": "real_estate_registration_act",
+    "jeonse_right": "real_estate_registration_act",
     "leasehold_registration": "housing_lease_protection_act",
+    "registry_warning": "real_estate_registration_act",
+    "ownership_transfer": "real_estate_registration_act",
     "violation": "building_registry_guide",
     "non_residential": "building_registry_guide",
     "registry_unchecked": "real_estate_registration_act",
@@ -52,20 +55,32 @@ def _source_url(source: dict[str, object]) -> str:
     return "https://www.iros.go.kr"
 
 
+def _source_title(source: dict[str, object]) -> str:
+    return str(source.get("required_item") or source.get("title") or source.get("id") or "공식 자료 확인")
+
+
 def retrieve_evidence(keys: list[str]) -> list[dict[str, str]]:
     sources = _load_sources()
     by_id = {source.get("id"): source for source in sources}
     fallback = sources[0] if sources else {}
 
     evidence: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
     for key in keys:
         source = by_id.get(SOURCE_BY_SIGNAL.get(key), fallback)
+        title = _source_title(source)
+        url = _source_url(source)
+        dedupe_key = (key, url)
+        if dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
         evidence.append(
             {
                 "key": key,
                 "summary": explanation_for(key),
-                "title": str(source.get("required_item") or source.get("title") or "공식 자료 확인"),
-                "url": _source_url(source),
+                "title": title,
+                "url": url,
+                "source_id": str(source.get("id") or SOURCE_BY_SIGNAL.get(key) or "fallback"),
             }
         )
     return evidence
