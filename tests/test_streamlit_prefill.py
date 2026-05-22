@@ -222,3 +222,25 @@ def test_pasted_document_runs_diagnosis_without_default_false_conflicts():
     assert result["snapshot"]["mortgage_flag"] is True
     assert result["snapshot"]["mortgage_amount"] == 90_000_000
     assert result["conflicts"] == []
+
+
+def test_build_basic_prefill_includes_unit_room_and_contract_type():
+    prefill = build_basic_prefill(
+        [
+            {
+                "source": "registry_ocr",
+                "data": {
+                    "address": "서울특별시 관악구 청룡동 875-12 청룡하이츠 제101동 제7층 제704호",
+                    "unit_dong": "101동",
+                    "room": "704호",
+                    "contract_type": "전세",
+                    "area_m2": 59.84,
+                    "floor": 7,
+                },
+            }
+        ]
+    )
+
+    assert prefill["unit_dong"] == "101동"
+    assert prefill["room"] == "704호"
+    assert prefill["contract_type"] == "전세"
