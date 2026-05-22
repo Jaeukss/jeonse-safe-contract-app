@@ -2,7 +2,8 @@ from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
-from app.components.document_upload import build_basic_prefill
+from app.components.document_upload import build_basic_prefill, build_document_review_prefill
+from app.components.document_review import apply_document_review_defaults
 
 
 SAMPLE_CONTRACT_TEXT = (
@@ -15,6 +16,11 @@ SAMPLE_CONTRACT_TEXT = (
     "계약 전 확인\n"
     "근저당권 설정, 채권최고액 9천만원"
 )
+
+
+class FakeStreamlit:
+    def __init__(self) -> None:
+        self.session_state = {}
 
 
 def test_pasted_document_prefills_basic_inputs():
@@ -32,6 +38,8 @@ def test_pasted_document_prefills_basic_inputs():
     assert app.session_state["basic_built_year"] == 2016
     assert app.session_state["basic_contract_stage"] == "계약 전 확인"
     assert app.session_state["basic_address"].startswith("서울 강서구")
+    assert app.session_state["mortgage_flag"] == "있음"
+    assert app.session_state["mortgage_amount"] == 90_000_000
 
 
 def test_build_basic_prefill_keeps_zero_monthly_rent():
@@ -51,6 +59,62 @@ def test_build_basic_prefill_keeps_zero_monthly_rent():
     assert prefill["address"].startswith("서울 강서구")
     assert prefill["deposit"] == 270_000_000
     assert prefill["monthly_rent"] == 0
+
+
+def test_build_document_review_prefill_collects_registry_fields():
+    prefill = build_document_review_prefill(
+        [
+            {
+                "source": "registry_ocr",
+                "data": {
+                    "registry_checked": True,
+                    "mortgage_flag": True,
+                    "mortgage_amount": 240_000_000,
+                    "seizure_flag": True,
+                    "provisional_seizure_flag": True,
+                    "trust_flag": True,
+                    "jeonse_right_flag": True,
+                    "registry_warning_flag": True,
+                },
+            }
+        ]
+    )
+
+    assert prefill["registry_checked"] is True
+    assert prefill["mortgage_flag"] is True
+    assert prefill["mortgage_amount"] == 240_000_000
+    assert prefill["seizure_flag"] is True
+    assert prefill["provisional_seizure_flag"] is True
+    assert prefill["trust_flag"] is True
+    assert prefill["jeonse_right_flag"] is True
+    assert prefill["registry_warning_flag"] is True
+
+
+def test_apply_document_review_defaults_sets_radio_labels():
+    fake = FakeStreamlit()
+    changed = apply_document_review_defaults(
+        fake,
+        {
+            "registry_checked": True,
+            "mortgage_flag": True,
+            "seizure_flag": False,
+            "provisional_seizure_flag": True,
+            "mortgage_amount": 240_000_000,
+        },
+    )
+
+    assert set(changed) == {
+        "registry_checked",
+        "mortgage_flag",
+        "seizure_flag",
+        "provisional_seizure_flag",
+        "mortgage_amount",
+    }
+    assert fake.session_state["registry_checked"] == "확인함"
+    assert fake.session_state["mortgage_flag"] == "있음"
+    assert fake.session_state["seizure_flag"] == "없음"
+    assert fake.session_state["provisional_seizure_flag"] == "있음"
+    assert fake.session_state["mortgage_amount"] == 240_000_000
 
 
 def test_uploaded_pdf_is_cached_and_parsed():
@@ -148,9 +212,9 @@ def test_pasted_document_runs_diagnosis_without_default_false_conflicts():
     app.button[0].click()
     app.run(timeout=20)
 
-    # After prefill there are three buttons:
-    # 0 pasted text analysis, 1 overwrite basic input, 2 start diagnosis.
-    app.button[2].click()
+    # After prefill there are four buttons:
+    # 0 pasted text analysis, 1 overwrite basic input, 2 overwrite review input, 3 start diagnosis.
+    app.button[3].click()
     app.run(timeout=30)
 
     result = app.session_state["result"]
