@@ -28,7 +28,10 @@ BASIC_INFO_SCHEMA_KEYS = (
     "seizure_flag",
     "provisional_seizure_flag",
     "trust_flag",
+    "jeonse_right_flag",
     "leasehold_registration_flag",
+    "ownership_transfer_recent_flag",
+    "registry_warning_flag",
     "building_register_checked",
     "main_usage",
     "violation_flag",
@@ -71,7 +74,12 @@ def extract_with_llm_if_configured(document_type: DocumentType, text: str) -> di
                 "be converted to KRW integer, set extraction_outlier_flag=true. "
                 "For Korean money words, convert 금이억오천만원정 to 250000000 and 천오백만 to 15000000. "
                 "For 1억 2,000 in a deposit context, treat 2,000 as 만원. "
-                "Do not infer contract_type unless deposit/monthly_rent evidence is visible."
+                "Extract registry booleans only when visible: mortgage_flag for 근저당/채권최고액, "
+                "seizure_flag for 압류, provisional_seizure_flag for 가압류, trust_flag for 신탁, "
+                "jeonse_right_flag for 전세권/전세권설정, leasehold_registration_flag for 임차권등기, "
+                "ownership_transfer_recent_flag for 소유권이전/소유권보존/접수일자, and "
+                "registry_warning_flag for 가등기, 경매, 가처분, 처분금지가처분, 예고등기, "
+                "소유권이전청구권. Do not infer contract_type unless deposit/monthly_rent evidence is visible."
             ),
         },
         {
@@ -130,6 +138,23 @@ def _flatten_llm_json(parsed: dict[str, Any]) -> dict[str, Any]:
             if key in contract:
                 flattened[key] = contract.get(key)
 
+    registry = parsed.get("registry")
+    if isinstance(registry, dict):
+        for key in (
+            "registry_checked",
+            "mortgage_flag",
+            "mortgage_amount",
+            "seizure_flag",
+            "provisional_seizure_flag",
+            "trust_flag",
+            "jeonse_right_flag",
+            "leasehold_registration_flag",
+            "ownership_transfer_recent_flag",
+            "registry_warning_flag",
+        ):
+            if key in registry:
+                flattened[key] = registry.get(key)
+
     validation = parsed.get("validation_status")
     if isinstance(validation, dict):
         if "is_outlier" in validation:
@@ -156,6 +181,8 @@ def merge_llm_fields(fields: dict[str, object], llm_fields: dict[str, Any]) -> d
                     continue
             except (TypeError, ValueError):
                 continue
-        if fields.get(key) in (None, "", 0):
+        current = fields.get(key)
+        current_missing = current is None or current == "" or (not isinstance(current, bool) and current == 0)
+        if current_missing:
             fields[key] = value
     return fields

@@ -18,6 +18,34 @@ HANGUL_DIGITS = {
 }
 
 HANGUL_SMALL_UNITS = {"십": 10, "백": 100, "천": 1000}
+MONEY_CHARS = r"금₩￦0-9,억천백십만원원정일이삼사오육칠팔구영공\s"
+
+CLEAR_PATTERNS = (
+    "해당없음",
+    "말소",
+    "기재사항없음",
+    "권리관계없음",
+    "을구사항없음",
+    "을구기재사항없음",
+)
+
+REGISTRY_WARNING_KEYWORDS = (
+    "가등기",
+    "경매",
+    "임의경매",
+    "강제경매",
+    "가처분",
+    "처분금지가처분",
+    "예고등기",
+    "소유권이전청구권",
+)
+
+OWNERSHIP_TRANSFER_KEYWORDS = (
+    "소유권이전",
+    "소유권보존",
+    "소유권일부이전",
+    "접수일자",
+)
 
 
 def _parse_hangul_under_10000(text: str) -> int:
@@ -61,9 +89,6 @@ def parse_money(text: str) -> int:
         total += float(eok.group(1)) * 100_000_000
         compact = compact[eok.end() :]
 
-    # OCR/manual text often arrives as "2억 4천만원" or "7천만원".
-    # Match the most specific unit first so "4천만원" is not counted again
-    # by the shorter "천" fallback.
     unit_patterns = (
         (r"(\d+(?:\.\d+)?)천만", 10_000_000),
         (r"(\d+(?:\.\d+)?)백만", 1_000_000),
@@ -80,7 +105,6 @@ def parse_money(text: str) -> int:
             compact = compact[: match.start()] + compact[match.end() :]
 
     if total and re.fullmatch(r"\d{1,4}", compact):
-        # Shorthand such as "1억 2,000" usually means 2,000만원 in contracts.
         total += float(compact) * 10_000
 
     if not total:
@@ -93,6 +117,10 @@ def parse_money(text: str) -> int:
         if digits:
             total = float(digits.group(0))
     return int(total)
+
+
+def _has_clear_phrase(compact: str) -> bool:
+    return any(pattern in compact for pattern in CLEAR_PATTERNS)
 
 
 def _has_negative_flag(compact: str, keyword: str) -> bool:
@@ -121,19 +149,50 @@ def _flag(compact: str, *keywords: str) -> bool:
     return False
 
 
+def _money_after_label(text: str, *labels: str) -> int:
+    raw = text or ""
+    for line in raw.splitlines():
+        compact_line = line.replace(" ", "")
+        if not any(label.replace(" ", "") in compact_line for label in labels):
+            continue
+        for label in labels:
+            match = re.search(rf"{re.escape(label)}\s*[:：\-]?\s*([{MONEY_CHARS}]{{2,}})", line)
+            if match:
+                amount = parse_money(match.group(1))
+                if amount:
+                    return amount
+        amount = parse_money(line)
+        if amount:
+            return amount
+
+    labels_pattern = "|".join(re.escape(label) for label in labels)
+    match = re.search(rf"(?:{labels_pattern})\s*[:：\-]?\s*([{MONEY_CHARS}]{{2,40}})", raw, re.I)
+    if match:
+        return parse_money(match.group(1))
+    return 0
+
+
 def parse_registry_text(text: str) -> dict[str, object]:
-    compact = re.sub(r"\s+", "", text or "")
-    clear = bool(re.search(r"해당없음|말소|기재사항없음|권리관계없음", compact))
-    amount_match = re.search(r"채권최고액[^0-9억천백십만]*(\d[\d,]*(?:억)?\s*\d*[\d,]*(?:천|백|십)?(?:만)?원?)", text or "")
-    provisional_seizure = False if clear else _flag(compact, "가압류")
+    raw = text or ""
+    compact = re.sub(r"\s+", "", raw)
+    clear = _has_clear_phrase(compact)
     seizure_compact = compact.replace("가압류", "")
+
+    mortgage_amount = _money_after_label(raw, "채권최고액", "채권 최고액", "근저당권")
+    mortgage_flag = _flag(compact, "근저당권", "근저당", "채권최고액") or mortgage_amount > 0
+
+    warning_flag = any(keyword in compact for keyword in REGISTRY_WARNING_KEYWORDS)
+    ownership_transfer = any(keyword in compact for keyword in OWNERSHIP_TRANSFER_KEYWORDS)
+
     return {
-        "registry_checked": bool(text.strip()),
-        "mortgage_flag": False if clear else _flag(compact, "근저당권", "채권최고액"),
-        "mortgage_amount": parse_money(amount_match.group(1)) if amount_match else 0,
+        "registry_checked": bool(raw.strip()),
+        "mortgage_flag": False if clear else mortgage_flag,
+        "mortgage_amount": mortgage_amount,
         "seizure_flag": False if clear else _flag(seizure_compact, "압류"),
-        "provisional_seizure_flag": provisional_seizure,
+        "provisional_seizure_flag": False if clear else _flag(compact, "가압류"),
         "trust_flag": False if clear else _flag(compact, "신탁등기", "신탁", "수탁자"),
+        "jeonse_right_flag": False if clear else _flag(compact, "전세권", "전세권설정"),
         "leasehold_registration_flag": False if clear else _flag(compact, "임차권등기"),
-        "ownership_transfer_recent_flag": bool(re.search(r"소유권이전|접수일자", compact)),
+        "ownership_transfer_recent_flag": ownership_transfer,
+        "registry_warning_flag": False if clear else warning_flag,
     }
