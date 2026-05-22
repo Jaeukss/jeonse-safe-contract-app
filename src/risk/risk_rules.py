@@ -43,12 +43,18 @@ def calculate_risk_score(snapshot: dict[str, Any], market: dict[str, Any]) -> tu
     if snapshot.get("trust_flag"):
         score += 50
         add_signal(signals, 50, "trust", "신탁등기 확인", "임대 권한과 수탁자 동의 여부를 확인해야 합니다.")
+    if snapshot.get("jeonse_right_flag"):
+        score += 20
+        add_signal(signals, 20, "jeonse_right", "전세권 설정 확인", "전세권의 설정 범위, 순위, 말소 조건을 확인해야 합니다.")
     if snapshot.get("leasehold_registration_flag"):
         score += 30
         add_signal(signals, 30, "leasehold_registration", "임차권등기 확인", "이전 임차인의 보증금 문제가 있었을 수 있습니다.")
+    if snapshot.get("registry_warning_flag"):
+        score += 35
+        add_signal(signals, 35, "registry_warning", "등기부 주의 권리관계 확인", "가등기, 경매, 가처분 등 임차권 확보에 영향을 줄 수 있는 권리관계를 확인해야 합니다.")
     if snapshot.get("ownership_transfer_recent_flag"):
         score += 10
-        add_signal(signals, 10, "ownership_transfer", "최근 소유권 이전", "소유권 변동 사유 확인이 필요합니다.")
+        add_signal(signals, 10, "ownership_transfer", "소유권 변동 단서 확인", "소유권 이전·보존·접수일자 등 소유자 변동 관련 단서를 확인해야 합니다.")
     if snapshot.get("violation_flag"):
         score += 25
         add_signal(signals, 25, "violation", "위반건축물 확인", "보증보험 또는 주거 안정성에 영향을 줄 수 있습니다.")
